@@ -1,0 +1,326 @@
+basePath: /
+definitions:
+  handlers.CreateTodoInput:
+    properties:
+      title:
+        type: string
+    type: object
+  handlers.RegisterInput:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  handlers.UpdateTodoInput:
+    properties:
+      completed:
+        type: boolean
+      title:
+        type: string
+    type: object
+  models.DeleteTodoResponse:
+    properties:
+      id:
+        example: 1
+        type: integer
+      message:
+        example: Tarefa deletada com sucesso
+        type: string
+    type: object
+  models.ErrorResponse:
+    properties:
+      error:
+        example: Mensagem de erro
+        type: string
+    type: object
+  models.LoginResponse:
+    properties:
+      message:
+        example: Login realizado com sucesso
+        type: string
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+    type: object
+  models.Todo:
+    properties:
+      completed:
+        type: boolean
+      createdAt:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+      userID:
+        description: chave estrangeira
+        type: integer
+    type: object
+  models.TodoListResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Todo'
+        type: array
+      filters: {}
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  models.User:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        description: aqui vai o hash da senha
+        type: string
+    type: object
+  models.UserResponse:
+    properties:
+      message:
+        example: Usuário registrado com sucesso
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+host: 0.0.0.0:3000
+info:
+  contact: {}
+  description: API REST para gerenciamento de tarefas.
+  title: Todo API em Go
+  version: "1.0"
+paths:
+  /api/todos:
+    get:
+      description: Retorna uma lista de tarefas do usuário com suporte a paginação,
+        filtros e ordenação
+      parameters:
+      - default: 1
+        description: Número da página
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Número de itens por página
+        in: query
+        maximum: 100
+        minimum: 1
+        name: limit
+        type: integer
+      - description: Filtro de pesquisa pelo título da tarefa
+        in: query
+        name: search
+        type: string
+      - description: Filtro de tarefas concluídas (true, false ou vazio)
+        in: query
+        name: completed
+        type: string
+      - default: created_at
+        description: Campo para ordenação (created_at, title, completed)
+        in: query
+        name: sort
+        type: string
+      - default: desc
+        description: Direção da ordenação (asc, desc)
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TodoListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Listar Tarefas
+      tags:
+      - Todos
+    post:
+      consumes:
+      - application/json
+      description: Cria uma nova tarefa para o usuário autenticado
+      parameters:
+      - description: Dados da tarefa
+        in: body
+        name: todo
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateTodoInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Todo'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Criar Tarefa
+      tags:
+      - Todos
+  /api/todos/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Atualiza uma tarefa existente do usuário autenticado
+      parameters:
+      - description: ID da tarefa
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.DeleteTodoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Atualizar Tarefa
+      tags:
+      - Todos
+    put:
+      consumes:
+      - application/json
+      description: Atualiza uma tarefa existente do usuário autenticado
+      parameters:
+      - description: ID da tarefa
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Dados da tarefa
+        in: body
+        name: todo
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateTodoInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Todo'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Atualizar Tarefa
+      tags:
+      - Todos
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Autentica um usuário com email e senha, retornando um token JWT
+      parameters:
+      - description: Dados do usuário
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RegisterInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Login de Usuário
+      tags:
+      - Users
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Registra um novo usuário com nome, email e senha
+      parameters:
+      - description: Dados do usuário
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RegisterInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.UserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Registrar Usuário
+      tags:
+      - Users
+swagger: "2.0"

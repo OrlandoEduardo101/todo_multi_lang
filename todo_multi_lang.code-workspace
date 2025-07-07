@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "backend"
+		},
+		{
+			"path": "backend/todo_spring"
+		},
+		{
+			"path": "backend/todo_go_fiber"
+		}
+	],
+	"settings": {}
+}

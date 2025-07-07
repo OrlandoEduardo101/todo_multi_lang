@@ -1,0 +1,497 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API REST para gerenciamento de tarefas.",
+        "title": "Todo API em Go",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "0.0.0.0:3000",
+    "basePath": "/",
+    "paths": {
+        "/api/todos": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retorna uma lista de tarefas do usuário com suporte a paginação, filtros e ordenação",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "Listar Tarefas",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Número da página",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "maximum": 100,
+                        "minimum": 1,
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Número de itens por página",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtro de pesquisa pelo título da tarefa",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filtro de tarefas concluídas (true, false ou vazio)",
+                        "name": "completed",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "created_at",
+                        "description": "Campo para ordenação (created_at, title, completed)",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "desc",
+                        "description": "Direção da ordenação (asc, desc)",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TodoListResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Cria uma nova tarefa para o usuário autenticado",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "Criar Tarefa",
+                "parameters": [
+                    {
+                        "description": "Dados da tarefa",
+                        "name": "todo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CreateTodoInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Todo"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/todos/{id}": {
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza uma tarefa existente do usuário autenticado",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "Atualizar Tarefa",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da tarefa",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados da tarefa",
+                        "name": "todo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpdateTodoInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Todo"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Atualiza uma tarefa existente do usuário autenticado",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todos"
+                ],
+                "summary": "Atualizar Tarefa",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID da tarefa",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.DeleteTodoResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "Autentica um usuário com email e senha, retornando um token JWT",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Login de Usuário",
+                "parameters": [
+                    {
+                        "description": "Dados do usuário",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.RegisterInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.LoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "description": "Registra um novo usuário com nome, email e senha",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Registrar Usuário",
+                "parameters": [
+                    {
+                        "description": "Dados do usuário",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.RegisterInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.UserResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handlers.CreateTodoInput": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.RegisterInput": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.UpdateTodoInput": {
+            "type": "object",
+            "properties": {
+                "completed": {
+                    "type": "boolean"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.DeleteTodoResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Tarefa deletada com sucesso"
+                }
+            }
+        },
+        "models.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string",
+                    "example": "Mensagem de erro"
+                }
+            }
+        },
+        "models.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Login realizado com sucesso"
+                },
+                "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+            }
+        },
+        "models.Todo": {
+            "type": "object",
+            "properties": {
+                "completed": {
+                    "type": "boolean"
+                },
+                "createdAt": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "userID": {
+                    "description": "chave estrangeira",
+                    "type": "integer"
+                }
+            }
+        },
+        "models.TodoListResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Todo"
+                    }
+                },
+                "filters": {},
+                "limit": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.User": {
+            "type": "object",
+            "properties": {
+                "createdAt": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "description": "aqui vai o hash da senha",
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Usuário registrado com sucesso"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.User"
+                }
+            }
+        }
+    }
+}
