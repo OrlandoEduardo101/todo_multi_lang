@@ -15,16 +15,31 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sq
       
-  todo_go:
+  # todo_go:
+  #   build:
+  #     context: ../backend/todo_go_fiber
+  #     dockerfile: Dockerfile
+  #   container_name: todo_go
+  #   restart: always
+  #   depends_on:
+  #     - postgres
+  #   ports:
+  #     - "3000:3000"
+  #   env_file:
+  #     - ../backend/.env
+  #   volumes:
+  #     - ../backend/.env:/app/.env
+  #   working_dir: /app
+
+  todo_java:
     build:
-      context: ../backend/todo_go_fiber
-      dockerfile: Dockerfile
-    container_name: todo_go
+      context: ../backend/todo_java_spring
+    container_name: todo_java
     restart: always
     depends_on:
       - postgres
     ports:
-      - "3000:3000"
+      - "8080:8080"
     env_file:
       - ../backend/.env
     volumes:
