@@ -8,21 +8,25 @@ class SecurityConfiguration {
   static const int bcryptCost = 10;
 
   @Bean()
-  PasswordEncoder passwordEncoder() => BCryptPasswordEncoder();
+  PasswordEncoder passwordEncoder() {
+    final encoder = BCryptPasswordEncoder();
+    print('🔐 PasswordEncoder criado com cost=$bcryptCost');
+    return encoder;
+  }
 
   @Bean()
   JwtService jwtService(ApplicationSettings settings) {
-    final secret = (settings['jwt.secret'] as String?) ??
+    final secret =
+        (settings['jwt.secret'] as String?) ??
         (settings['jwt']?['secret'] as String?) ??
         Platform.environment['JWT_SECRET'] ??
         'change-me-in-prod';
 
-    final expRaw = settings['jwt.expirationHours'] ??
-      settings['jwt']?['expirationHours'] ??
-      Platform.environment['JWT_EXPIRATION_HOURS'];
-    final exp = expRaw is int
-      ? expRaw
-      : int.tryParse(expRaw?.toString() ?? '') ?? 72;
+    final expRaw =
+        settings['jwt.expirationHours'] ??
+        settings['jwt']?['expirationHours'] ??
+        Platform.environment['JWT_EXPIRATION_HOURS'];
+    final exp = expRaw is int ? expRaw : int.tryParse(expRaw?.toString() ?? '') ?? 72;
 
     // Instantiate JwtService directly with secret and expiration
     return JwtService(secret: secret);

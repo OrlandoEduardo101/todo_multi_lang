@@ -4,6 +4,7 @@ import '../domain/repositories/todo_repository.dart';
 import '../dto/todo_dto.dart';
 import '../dto/user_dto.dart';
 import '../dto/common_dto.dart';
+import '../services/user_details_service.dart';
 
 /// Todo Controller - handles todo management
 @Api(tag: 'Todos', description: 'Todo management endpoints')
@@ -26,7 +27,7 @@ class TodoController {
   @ApiResponse(500, description: 'Internal server error')
   @Get('/')
   Future<TodoPaginatedResponse> listTodos(
-    @Context('user') UserProfile currentUser,
+    @Context('user') CustomUserDetails currentUser,
     @Query('page') int? page,
     @Query('limit') int? limit,
     @Query('search') String? search,
@@ -97,7 +98,7 @@ class TodoController {
   @ApiResponse(400, description: 'Invalid request data')
   @ApiResponse(500, description: 'Internal server error')
   @Post('/')
-  Future<TodoProfile> createTodo(@Context('user') UserProfile currentUser, @Body() CreateTodoRequest data) async {
+  Future<TodoProfile> createTodo(@Context('user') CustomUserDetails currentUser, @Body() CreateTodoRequest data) async {
     try {
       return await todoRepository.create(currentUser.id, data);
     } catch (e) {

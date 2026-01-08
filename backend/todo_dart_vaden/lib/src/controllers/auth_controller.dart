@@ -37,14 +37,14 @@ class AppAuthController {
     }
 
     // Hash password using BCrypt (via VadenSecurity)
-    final hashedPassword = passwordEncoder.encode(data.password);
+    // final hashedPassword = passwordEncoder.encode(data.password);
 
     // Create user
     final createRequest = CreateUserRequest(
       firstName: data.firstName,
       lastName: data.lastName,
       email: data.email,
-      password: hashedPassword,
+      password: data.password,
     );
 
     try {
@@ -71,27 +71,40 @@ class AppAuthController {
     }
 
     try {
-      // Find user by email
-      final user = await userRepository.findByEmail(loginData.email);
-      if (user == null) {
+      // Find user entity by email (includes password hash)
+      print('🔍 POST Login: Buscando usuário ${loginData.email}');
+      final userEntity = await userRepository.findEntityByEmail(loginData.email);
+      if (userEntity == null) {
+        print('❌ POST Login: Usuário não encontrado');
         throw const ResponseException(401, 'Invalid credentials');
       }
 
-      // Verify password - this needs the password hash from database
-      // TODO: Add method to get user with password for verification
+      print('✅ POST Login: Usuário encontrado');
+      print('🔐 Senha recebida: ${loginData.password}');
+      print('🔐 Hash no DB (30 chars): ${userEntity.password.substring(0, 30)}...');
+
+      // Verify password using BCrypt
+      print('🔑 Testando passwordEncoder.matches...');
+      final passwordMatches = passwordEncoder.matches(loginData.password, userEntity.password);
+      print('🔑 Resultado: $passwordMatches');
+
+      if (!passwordMatches) {
+        print('❌ POST Login: Senha não confere');
+        throw const ResponseException(401, 'Invalid credentials');
+      }
 
       // TODO: Use JwtService from vaden_security to generate token
-      final token = 'token_${user.id}_${DateTime.now().millisecondsSinceEpoch}';
+      final token = 'token_${userEntity.id}_${DateTime.now().millisecondsSinceEpoch}';
 
       return AuthResponse(
         token: token,
         expiresIn: 259200, // 72 hours
         user: UserAuthProfile(
-          id: user.id,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          roles: user.roles,
+          id: userEntity.id,
+          email: userEntity.email,
+          firstName: userEntity.firstName,
+          lastName: userEntity.lastName,
+          roles: userEntity.roles,
         ),
       );
     } catch (e) {

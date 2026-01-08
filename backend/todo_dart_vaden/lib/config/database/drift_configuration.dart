@@ -20,13 +20,10 @@ class DriftConfiguration {
   @Bean()
   QueryExecutor queryExecutor(ApplicationSettings settings) {
     final postgresRaw = settings['postgres'];
-    final Map<String, dynamic> postgres =
-        postgresRaw is Map ? postgresRaw.cast<String, dynamic>() : <String, dynamic>{};
+    final postgres = postgresRaw is Map ? postgresRaw.cast<String, dynamic>() : <String, dynamic>{};
     final rawPort = postgres['port'];
     final resolvedPortStr = _resolveEnv(rawPort);
-    final port = rawPort is int
-        ? rawPort
-        : int.tryParse(resolvedPortStr ?? '') ?? 5432;
+    final port = rawPort is int ? rawPort : int.tryParse(resolvedPortStr ?? '') ?? 5432;
 
     return PgDatabase(
       settings: const pg.ConnectionSettings(sslMode: pg.SslMode.disable),
