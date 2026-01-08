@@ -1,0 +1,39 @@
+server:
+  port: 8080
+  host: 0.0.0.0
+
+postgres:
+  host: ${DB_HOST:localhost}
+  port: ${DB_PORT:5432}
+  database: ${DB_NAME:todo_db}
+  username: ${DB_USER:postgres}
+  password: ${DB_PASSWORD:postgres}
+  maxConnectionCount: 10
+  ssl: ${DB_SSL:disable}
+
+jwt:
+  secret: ${JWT_SECRET:your-secret-key-change-in-production}
+  expirationHours: 72
+
+security:
+  bcryptCost: 10
+  corsAllowedOrigins:
+    - http://localhost:3000
+    - http://localhost:3001
+    - http://localhost:8080
+
+migration:
+  path: ./migrations
+  enabled: true
+
+openapi:
+  enable: true
+  title: "TODO API - Vaden Backend"
+  version: "1.0.0"
+  description: "API REST para gerenciamento de tarefas com autenticação JWT"
+  contactName: "Vaden Team"
+  contactEmail: "dev@vaden.dev"
+
+logging:
+  level: ${LOG_LEVEL:INFO}
+  format: json
