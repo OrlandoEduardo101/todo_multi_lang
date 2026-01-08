@@ -8,8 +8,8 @@ import '../dto/user_dto.dart';
 /// Auth Controller - handles user registration and login
 @Api(tag: 'Authentication', description: 'User authentication endpoints')
 @Controller('/auth')
-class AuthController {
-  AuthController({required this.userRepository, required this.passwordEncoder});
+class AppAuthController {
+  AppAuthController({required this.userRepository, required this.passwordEncoder});
   final UserRepository userRepository;
   final PasswordEncoder passwordEncoder;
 

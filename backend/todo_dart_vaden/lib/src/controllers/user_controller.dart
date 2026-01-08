@@ -3,6 +3,7 @@ import 'package:vaden/vaden.dart';
 import '../domain/repositories/user_repository.dart';
 import '../dto/todo_dto.dart';
 import '../dto/user_dto.dart';
+import '../dto/common_dto.dart';
 
 /// User Controller - handles user management
 @Api(tag: 'Users', description: 'User management endpoints')
@@ -16,11 +17,11 @@ class UserController {
   @ApiResponse(
     200,
     description: 'Users retrieved successfully',
-    content: ApiContent(type: 'application/json', schema: PaginatedResponse),
+    content: ApiContent(type: 'application/json', schema: UserPaginatedResponse),
   )
   @ApiResponse(500, description: 'Internal server error')
   @Get('/')
-  Future<PaginatedResponse<UserProfile>> listUsers(@Query('page') int? page, @Query('limit') int? limit) async {
+  Future<UserPaginatedResponse> listUsers(@Query('page') int? page, @Query('limit') int? limit) async {
     try {
       final pageNum = page ?? 1;
       final limitNum = limit ?? 10;
@@ -29,13 +30,7 @@ class UserController {
       final total = await userRepository.getTotalCount();
       final hasMore = (pageNum * limitNum) < total;
 
-      return PaginatedResponse<UserProfile>(
-        data: users,
-        page: pageNum,
-        limit: limitNum,
-        total: total,
-        hasMore: hasMore,
-      );
+      return UserPaginatedResponse(data: users, page: pageNum, limit: limitNum, total: total, hasMore: hasMore);
     } catch (e) {
       throw ResponseException(500, 'Failed to list users: ${e.toString()}');
     }
@@ -127,7 +122,7 @@ class UserController {
         throw const ResponseException(404, 'User not found');
       }
 
-      return StatusResponse(message: 'User deleted successfully');
+      return const StatusResponse(message: 'User deleted successfully');
     } catch (e) {
       if (e is ResponseException) rethrow;
       throw ResponseException(500, 'Failed to delete user: ${e.toString()}');
@@ -136,9 +131,3 @@ class UserController {
 }
 
 /// Status response DTO
-class StatusResponse {
-  StatusResponse({required this.message});
-  final String message;
-
-  Map<String, dynamic> toJson() => {'message': message};
-}

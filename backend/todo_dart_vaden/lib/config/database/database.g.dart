@@ -611,9 +611,6 @@ class $TodosTableTable extends TodosTable
     false,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("completed" IN (0, 1))',
-    ),
     defaultValue: const Constant(false),
   );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(

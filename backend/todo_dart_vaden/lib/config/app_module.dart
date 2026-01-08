@@ -33,8 +33,8 @@ class AppModule {
   AuthService getAuthService() => AuthService(getUserRepository(), getPasswordEncoder());
 
   /// Get Auth Controller
-  AuthController getAuthController() =>
-      AuthController(userRepository: getUserRepository(), passwordEncoder: getPasswordEncoder());
+  AppAuthController getAuthController() =>
+      AppAuthController(userRepository: getUserRepository(), passwordEncoder: getPasswordEncoder());
 
   /// Get User Controller
   UserController getUserController() => UserController(userRepository: getUserRepository());

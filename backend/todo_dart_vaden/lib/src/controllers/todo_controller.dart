@@ -3,6 +3,7 @@ import 'package:vaden/vaden.dart';
 import '../domain/repositories/todo_repository.dart';
 import '../dto/todo_dto.dart';
 import '../dto/user_dto.dart';
+import '../dto/common_dto.dart';
 
 /// Todo Controller - handles todo management
 @Api(tag: 'Todos', description: 'Todo management endpoints')
@@ -20,11 +21,11 @@ class TodoController {
   @ApiResponse(
     200,
     description: 'Todos retrieved successfully',
-    content: ApiContent(type: 'application/json', schema: PaginatedResponse),
+    content: ApiContent(type: 'application/json', schema: TodoPaginatedResponse),
   )
   @ApiResponse(500, description: 'Internal server error')
   @Get('/')
-  Future<PaginatedResponse<TodoProfile>> listTodos(
+  Future<TodoPaginatedResponse> listTodos(
     @Context('user') UserProfile currentUser,
     @Query('page') int? page,
     @Query('limit') int? limit,
@@ -53,13 +54,7 @@ class TodoController {
 
       final hasMore = (pageNum * limitNum) < total;
 
-      return PaginatedResponse<TodoProfile>(
-        data: todos,
-        page: pageNum,
-        limit: limitNum,
-        total: total,
-        hasMore: hasMore,
-      );
+      return TodoPaginatedResponse(data: todos, page: pageNum, limit: limitNum, total: total, hasMore: hasMore);
     } catch (e) {
       throw ResponseException(500, 'Failed to list todos: ${e.toString()}');
     }
@@ -154,7 +149,7 @@ class TodoController {
         throw const ResponseException(404, 'Todo not found');
       }
 
-      return StatusResponse(message: 'Todo deleted successfully');
+      return const StatusResponse(message: 'Todo deleted successfully');
     } catch (e) {
       if (e is ResponseException) rethrow;
       throw ResponseException(500, 'Failed to delete todo: ${e.toString()}');
@@ -163,9 +158,3 @@ class TodoController {
 }
 
 /// Status response DTO
-class StatusResponse {
-  StatusResponse({required this.message});
-  final String message;
-
-  Map<String, dynamic> toJson() => {'message': message};
-}

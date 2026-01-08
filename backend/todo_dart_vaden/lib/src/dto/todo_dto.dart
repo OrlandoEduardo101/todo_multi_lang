@@ -1,4 +1,5 @@
 import 'package:vaden/vaden.dart';
+import 'paginated_response.dart';
 
 /// Todo profile DTO for GET responses
 @DTO()
@@ -77,8 +78,8 @@ class UpdateTodoRequest {
 
 /// Paginated response wrapper
 @DTO()
-class PaginatedResponse<T> {
-  PaginatedResponse({
+class TodoPaginatedResponse implements PaginatedResponse<TodoProfile> {
+  TodoPaginatedResponse({
     required this.data,
     required this.page,
     required this.limit,
@@ -86,22 +87,26 @@ class PaginatedResponse<T> {
     required this.hasMore,
   });
 
-  factory PaginatedResponse.fromJson(Map<String, dynamic> json, T Function(Map<String, dynamic>) fromJsonItem) =>
-      PaginatedResponse(
-        data: (json['data'] as List).map((item) => fromJsonItem(item as Map<String, dynamic>)).toList(),
-        page: json['page'] as int,
-        limit: json['limit'] as int,
-        total: json['total'] as int,
-        hasMore: json['hasMore'] as bool,
-      );
-  final List<T> data;
+  factory TodoPaginatedResponse.fromJson(Map<String, dynamic> json) => TodoPaginatedResponse(
+    data: (json['data'] ?? []).map((item) => TodoProfile.fromJson(item as Map<String, dynamic>)).toList(),
+    page: json['page'] ?? 1,
+    limit: json['limit'] ?? 10,
+    total: json['total'] ?? 0,
+    hasMore: json['hasMore'] ?? false,
+  );
+  @override
+  final List<TodoProfile> data;
+  @override
   final int page;
+  @override
   final int limit;
+  @override
   final int total;
+  @override
   final bool hasMore;
 
-  Map<String, dynamic> toJson(List<Map<String, dynamic>> Function(List<T>) toJsonList) => {
-    'data': toJsonList(data),
+  Map<String, dynamic> toJson() => {
+    'data': data.map((e) => e.toJson()).toList(),
     'page': page,
     'limit': limit,
     'total': total,

@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'package:drift/drift.dart';
 import 'package:drift_postgres/drift_postgres.dart';
 import 'package:postgres/postgres.dart' as pg;
@@ -6,7 +7,6 @@ import 'package:vaden/vaden.dart';
 import 'database.dart';
 import '../../src/database/daos/todo_dao.dart';
 import '../../src/database/daos/user_dao.dart';
-
 
 @Configuration()
 class DriftConfiguration {
@@ -18,16 +18,27 @@ class DriftConfiguration {
   }
 
   @Bean()
-  QueryExecutor queryExecutor(ApplicationSettings settings) => PgDatabase(
-    settings: const pg.ConnectionSettings(sslMode: pg.SslMode.disable),
-    endpoint: pg.Endpoint(
-      host: settings['database']['host'] as String? ?? 'localhost',
-      database: settings['database']['database'] as String? ?? 'todo_db',
-      username: settings['database']['username'] as String? ?? 'postgres',
-      password: settings['database']['password'] as String? ?? 'postgres',
-      port: settings['database']['port'] as int? ?? 5432,
-    ),
-  );
+  QueryExecutor queryExecutor(ApplicationSettings settings) {
+    final postgresRaw = settings['postgres'];
+    final Map<String, dynamic> postgres =
+        postgresRaw is Map ? postgresRaw.cast<String, dynamic>() : <String, dynamic>{};
+    final rawPort = postgres['port'];
+    final resolvedPortStr = _resolveEnv(rawPort);
+    final port = rawPort is int
+        ? rawPort
+        : int.tryParse(resolvedPortStr ?? '') ?? 5432;
+
+    return PgDatabase(
+      settings: const pg.ConnectionSettings(sslMode: pg.SslMode.disable),
+      endpoint: pg.Endpoint(
+        host: _resolveEnv(postgres['host']) ?? 'localhost',
+        database: _resolveEnv(postgres['database']) ?? 'todo_db',
+        username: _resolveEnv(postgres['username']) ?? 'postgres',
+        password: _resolveEnv(postgres['password']) ?? 'postgres',
+        port: port,
+      ),
+    );
+  }
 
   @Bean()
   UserDao userDao(AppDatabase db) => UserDao(db);
@@ -45,5 +56,17 @@ class DriftConfiguration {
         print('❌ Erro ao inicializar banco: $e');
       }
     });
+  }
+
+  String? _resolveEnv(dynamic raw) {
+    if (raw == null) return null;
+    final s = raw.toString();
+    final m = RegExp(r'^\$\{([^:}]+)(?::([^}]*))?\}$').firstMatch(s);
+    if (m != null) {
+      final key = m.group(1)!;
+      final def = m.group(2);
+      return Platform.environment[key] ?? def ?? s;
+    }
+    return s;
   }
 }

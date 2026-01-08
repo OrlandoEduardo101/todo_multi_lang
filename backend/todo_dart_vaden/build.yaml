@@ -1,0 +1,10 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          sql:
+            dialects:
+              - postgres
+      vaden_class_scanner:vaden_class_scanner:
+        enabled: true

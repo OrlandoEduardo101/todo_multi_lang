@@ -33,6 +33,8 @@ services:
       DB_USER: ${POSTGRES_USER:-postgres}
       DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       DB_NAME: ${POSTGRES_DB:-todo_db}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-prod}
+      JWT_EXPIRATION_HOURS: ${JWT_EXPIRATION_HOURS:-72}
     ports:
       - "8080:8080"
     volumes:

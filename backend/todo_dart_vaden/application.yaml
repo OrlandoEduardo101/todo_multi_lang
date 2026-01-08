@@ -11,9 +11,9 @@ postgres:
   maxConnectionCount: 10
   ssl: ${DB_SSL:disable}
 
-jwt:
-  secret: ${JWT_SECRET:your-secret-key-change-in-production}
-  expirationHours: 72
+# Use dotted keys so JwtService.withSettings can read strings
+jwt.secret: ${JWT_SECRET:your-secret-key-change-in-production}
+jwt.expirationHours: ${JWT_EXPIRATION_HOURS:72}
 
 security:
   bcryptCost: 10

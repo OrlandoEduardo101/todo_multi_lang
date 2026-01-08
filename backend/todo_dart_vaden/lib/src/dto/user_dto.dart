@@ -1,4 +1,5 @@
 import 'package:vaden/vaden.dart';
+import 'paginated_response.dart';
 
 /// User profile DTO for GET responses
 /// Excludes sensitive fields like passwords
@@ -41,6 +42,43 @@ class UserProfile {
     'roles': roles,
     'createdAt': createdAt.toIso8601String(),
     'updatedAt': updatedAt.toIso8601String(),
+  };
+}
+
+@DTO()
+class UserPaginatedResponse implements PaginatedResponse<UserProfile> {
+  UserPaginatedResponse({
+    required this.data,
+    required this.page,
+    required this.limit,
+    required this.total,
+    required this.hasMore,
+  });
+
+  factory UserPaginatedResponse.fromJson(Map<String, dynamic> json) => UserPaginatedResponse(
+    data: (json['data'] as List).map((item) => UserProfile.fromJson(item as Map<String, dynamic>)).toList(),
+    page: json['page'] as int,
+    limit: json['limit'] as int,
+    total: json['total'] as int,
+    hasMore: json['hasMore'] as bool,
+  );
+  @override
+  final List<UserProfile> data;
+  @override
+  final int page;
+  @override
+  final int limit;
+  @override
+  final int total;
+  @override
+  final bool hasMore;
+
+  Map<String, dynamic> toJson() => {
+    'data': data.map((e) => e.toJson()).toList(),
+    'page': page,
+    'limit': limit,
+    'total': total,
+    'hasMore': hasMore,
   };
 }
 
