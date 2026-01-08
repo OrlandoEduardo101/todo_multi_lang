@@ -101,38 +101,22 @@ flutter run
 
 ## 📚 Backend Implementations
 
+Cada backend implementa a mesma API REST com as mesmas funcionalidades, mas usando diferentes linguagens e frameworks. O objetivo é comparar abordagens, arquiteturas e padrões de desenvolvimento.
+
 ### ✅ Go + Fiber - COMPLETE
 
 **Location:** `backend/todo_go_fiber/`
 
-A fast, minimalist backend using Go and the Fiber framework.
-
-**Key Features:**
-- Lightning-fast performance
-- Simple and clean code
-- Built-in middleware support
-- WebSocket capabilities
-- Excellent concurrency handling
-
 **Status:**
-- ✅ User authentication with JWT
-- ✅ Complete Todo CRUD
+- ✅ User authentication and authorization
+- ✅ Complete Todo CRUD operations
 - ✅ Advanced filtering and pagination
 - ✅ Role-based access control
 - ✅ OpenAPI/Swagger documentation
 - ✅ Docker support
 - 🔄 Unit tests (in progress)
 
-**Technology Stack:**
-- Framework: Fiber v2.52.8
-- Database: PostgreSQL
-- Auth: JWT (golang-jwt)
-- Password: bcrypt
-- Documentation: Swagger/OpenAPI
-
-**Documentation:**
-- Start with `backend/todo_go_fiber/README.md`
-- Architecture: `backend/todo_go_fiber/docs/STRUCTURE.md` (if available)
+**Documentation:** `backend/todo_go_fiber/README.md`
 
 ---
 
@@ -140,78 +124,35 @@ A fast, minimalist backend using Go and the Fiber framework.
 
 **Location:** `backend/todo_java_spring/`
 
-A robust backend using Java and Spring Boot framework.
-
-**Key Features:**
-- Comprehensive Spring ecosystem
-- Strong typing and mature platform
-- AOP and interceptors
-- Transaction management
-- Extensive testing capabilities
-
-**Current Status:**
-- ✅ Project structure
+**Status:**
+- ✅ Project structure and setup
 - 🔄 User registration
-- ⏳ Authentication system
-- ⏳ Complete Todo CRUD
-- ⏳ Advanced features
-- ⏳ Tests
+- ⏳ Authentication and authorization
+- ⏳ Todo CRUD operations
+- ⏳ Advanced filtering and pagination
+- ⏳ Tests and documentation
+- ⏳ Docker support
 
-**Technology Stack:**
-- Framework: Spring Boot 3.x
-- Build Tool: Maven
-- Database: PostgreSQL
-- Auth: Spring Security + JWT
-- Testing: JUnit 5 + Mockito
-
-**Getting Started:**
-- See `backend/todo_java_spring/HELP.md`
-- Maven commands in `backend/todo_java_spring/README.md`
+**Documentation:** `backend/todo_java_spring/HELP.md`
 
 ---
 
-### 🏗️ Dart + Vaden - NEWLY CREATED
+### 🔄 Dart + Vaden - IN PROGRESS
 
 **Location:** `backend/todo_dart_vaden/`
 
-A modern backend using Dart and the Vaden framework following Clean Architecture.
-
-**Key Features:**
-- Clean Architecture (Domain → Data → Controllers)
-- Type-safe code with null safety
-- Annotation-based controllers and DTOs
-- Automatic dependency injection
-- Drift ORM for type-safe queries
-- Excellent code generation
-
-**Architecture:**
-- Controllers → DTOs → Repositories → Domain
-- Soft delete support
-- Modular dependency injection
-- OpenAPI/Swagger auto-generation
-
 **Status:**
 - ✅ Project structure and setup
-- ✅ Documentation and guidelines
-- 🏗️ User authentication (in development)
-- 🏗️ Todo CRUD
-- 🏗️ Advanced features
+- ✅ User authentication and authorization
+- ✅ User registration and login
+- ✅ Password encoding and verification
+- ✅ Exception handling
+- ✅ Docker support
+- ✅ Todo CRUD operations
+- ✅ Advanced filtering and pagination
 - 🏗️ Tests
 
-**Technology Stack:**
-- Language: Dart 3.0+
-- Framework: Vaden 3.0
-- ORM: Drift
-- Database: PostgreSQL
-- Auth: Vaden Security + JWT
-- Password: bcrypt
-
-**Documentation:**
-- Quick Start: `backend/todo_dart_vaden/README.md`
-- Architecture Guide: `backend/todo_dart_vaden/docs/ARCHITECTURE.md`
-- Development Guide: `backend/todo_dart_vaden/docs/DEVELOPMENT_GUIDE.md`
-- **AI Development:** `backend/todo_dart_vaden/docs/AI-NOTES.md`
-- Framework Reference: `backend/todo_dart_vaden/docs/vaden.md`
+**Documentation:** `backend/todo_dart_vaden/README.md`
 
 ---
 
@@ -221,7 +162,7 @@ A modern backend using Dart and the Vaden framework following Clean Architecture
 
 **Location:** `frontend/todo_flutter/`
 
-Cross-platform mobile app built with Flutter.
+Aplicativo multiplataforma construído com Flutter, consumindo qualquer um dos backends disponíveis.
 
 **Supported Platforms:**
 - iOS ✅
@@ -230,17 +171,14 @@ Cross-platform mobile app built with Flutter.
 - Windows (planned)
 - macOS (planned)
 
-**Features:**
-- Beautiful Material Design UI
-- Real-time updates
-- Offline support (planned)
-- Multiple backend integration
+**Status:**
+- ✅ Base structure
+- ✅ UI components
+- ✅ Firebase integration
+- 🔄 Backend API integration
+- 🏗️ Offline support
 
-**Technology:**
-- Framework: Flutter 3.x
-- State Management: result_command + Routefly
-- Backend: Firebase (initially)
-- Database: Cloud Firestore
+**Documentation:** `frontend/todo_flutter/README.md`
 
 ---
 
@@ -330,12 +268,12 @@ GET /docs/openapi.json       # OpenAPI specification
 | Feature | Go Fiber | Java Spring | Dart Vaden | Flutter |
 |---------|----------|------------|-----------|---------|
 | Status | ✅ Complete | 🔄 In Dev | 🏗️ Planned | ✅ Active |
-| Auth | ✅ | 🔄 | 🏗️ | ✅ |
-| CRUD | ✅ | 🔄 | 🏗️ | ✅ |
-| Filtering | ✅ | 🔄 | 🏗️ | ✅ |
-| Pagination | ✅ | 🔄 | 🏗️ | ✅ |
+| Auth | ✅ | 🔄 | ✅ | ✅ |
+| CRUD | ✅ | 🔄 | ✅ | ✅ |
+| Filtering | ✅ | 🔄 | ✅ | ✅ |
+| Pagination | ✅ | 🔄 | ✅ | ✅ |
 | Tests | 🔄 | 🔄 | 🏗️ | 🔄 |
-| Docker | ✅ | 🔄 | 🏗️ | - |
+| Docker | ✅ | 🔄 | ✅ | - |
 | Docs | ✅ | 🔄 | ✅ | 🔄 |
 
 ---

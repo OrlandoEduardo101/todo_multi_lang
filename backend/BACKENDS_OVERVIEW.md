@@ -101,46 +101,72 @@ To demonstrate the implementation of the same application across different techn
 
 ---
 
-### 3. **Dart Vaden** 🚀 (NEWLY CREATED)
+### 3. **Dart Vaden** � (IN PROGRESS)
 📁 `/backend/todo_dart_vaden/`
 
 **Stack:**
-- Language: Dart 3.0+
-- Framework: Vaden 3.0
-- Database: PostgreSQL (with Drift ORM)
-- Auth: Vaden Security (JWT)
-- Password: bcrypt
+- Language: Dart 3.10.4
+- Framework: Vaden v3.0.0
+- Database: PostgreSQL
+- ORM: Drift (drift_postgres)
+- Auth: VadenSecurity (JWT)
+- Password: BCryptPasswordEncoder (cost=10)
 
 **Architecture:**
 - Clean Architecture (Domain → Data → Controllers)
 - Annotation-based (Controllers, DTOs, Repositories, Services)
-- Automatic dependency injection
+- Automatic dependency injection (auto-injector)
 - Drift ORM for type-safe queries
+- VadenSecurity integration
+- Code generation with build_runner
 
-**Features (Planned):**
-- 🏗️ User registration & JWT login
-- 🏗️ Todo CRUD with pagination and filters
-- 🏗️ Advanced filtering and sorting
-- 🏗️ Soft delete support
-- 🏗️ OpenAPI/Swagger documentation
-- 🏗️ Modular dependency injection
-- 🏗️ Docker support
+**Features:**
+- ✅ User registration with password hashing
+- ✅ JWT authentication (Basic Auth → JWT)
+- ✅ VadenSecurity UserDetailsService integration
+- ✅ Custom authentication endpoints (POST /auth/register, POST /auth/login)
+- ✅ Password encoding/verification with BCrypt
+- ✅ Exception handling with proper HTTP status codes
+- ✅ CORS middleware
+- ✅ OpenAPI/Swagger documentation
+- ✅ Docker support
+- ✅ Todo CRUD operations (create, read, update, delete)
+- ✅ Advanced filtering and pagination (search, completed status, sorting)
+- 🏗️ Unit and integration tests
 
 **Architecture Layers:**
-- `lib/config/` - Configuration & setup
-- `lib/src/controllers/` - HTTP endpoints
-- `lib/src/dto/` - Data Transfer Objects
-- `lib/src/repository/` - Data access
-- `lib/src/service/` - Business logic (optional)
-- `lib/src/domain/` - Core entities & errors
-- `migrations/` - Database schema
+- `lib/config/` - Configuration (Database, Security, DI)
+- `lib/src/controllers/` - HTTP endpoints (AuthController, TodoController, UserController)
+- `lib/src/dto/` - Data Transfer Objects with @DTO annotation
+- `lib/src/domain/repositories/` - Repository interfaces
+- `lib/src/data/repositories/` - Repository implementations
+- `lib/src/services/` - Business logic (UserDetailsServiceImpl)
+- `lib/src/domain/entities/` - Drift database entities
+- `lib/vaden_application.dart` - Generated aggregator (routes, DI, exception handling)
+- `application.yaml` - Configuration with environment variables
 
 **Key Advantages:**
 - Type-safe with strong null safety
-- Fast compilation
-- Excellent code generation
+- Fast compilation and hot reload
+- Excellent code generation capabilities
 - Easy to learn for Flutter developers
+- Clean separation of concerns
+- Automatic API documentation generation
 - Strong community support
+
+**Authentication Flow:**
+1. User registers via POST /auth/register → password hashed with BCrypt
+2. User logs in via GET /auth/login (Basic Auth) or POST /auth/login (JSON)
+3. VadenSecurity validates credentials via UserDetailsServiceImpl
+4. BCrypt verifies password hash
+5. JWT token returned to client
+6. Protected endpoints require JWT in Authorization header
+
+**Recent Fixes:**
+- Fixed double-encoding password bug (register was hashing twice)
+- Fixed exception handling to return correct HTTP status codes (401, 403, etc.) instead of always 500
+- Fixed type mismatch between CustomUserDetails and UserProfile in context injection
+- Enhanced CustomUserDetails with full user information for context propagation
 
 ---
 
@@ -148,18 +174,18 @@ To demonstrate the implementation of the same application across different techn
 
 | Feature | Go Fiber | Java Spring | Dart Vaden |
 |---------|----------|------------|-----------|
-| **User Registration** | ✅ | 🔄 | 🏗️ |
-| **JWT Login** | ✅ | 🔄 | 🏗️ |
-| **Todo CRUD** | ✅ | 🔄 | 🏗️ |
-| **Pagination** | ✅ | 🔄 | 🏗️ |
-| **Filtering** | ✅ | 🔄 | 🏗️ |
-| **Sorting** | ✅ | 🔄 | 🏗️ |
-| **Soft Delete** | ✅ | 🔄 | 🏗️ |
-| **Role-Based Access** | ✅ | 🔄 | 🏗️ |
-| **OpenAPI Docs** | ✅ | 🔄 | 🏗️ |
-| **Docker Support** | ✅ | 🔄 | 🏗️ |
-| **Unit Tests** | 🔄 | 🔄 | 🔄 |
-| **Integration Tests** | 🔄 | 🔄 | 🔄 |
+| **User Registration** | ✅ | 🔄 | ✅ |
+| **JWT Login** | ✅ | 🔄 | ✅ |
+| **Todo CRUD** | ✅ | 🔄 | ✅ |
+| **Pagination** | ✅ | 🔄 | ✅ |
+| **Filtering** | ✅ | 🔄 | ✅ |
+| **Sorting** | ✅ | 🔄 | ✅ |
+| **Soft Delete** | ✅ | 🔄 | ✅ |
+| **Role-Based Access** | ✅ | 🔄 | ✅ |
+| **OpenAPI Docs** | ✅ | 🔄 | ✅ |
+| **Docker Support** | ✅ | 🔄 | ✅ |
+| **Unit Tests** | 🔄 | 🔄 | 🏗️ |
+| **Integration Tests** | 🔄 | 🔄 | 🏗️ |
 
 ---
 
@@ -353,12 +379,12 @@ By studying these implementations, you'll understand:
 | Milestone | Go Fiber | Java Spring | Dart Vaden |
 |-----------|----------|------------|-----------|
 | Basic Setup | ✅ | ✅ | ✅ |
-| Auth System | ✅ | 🔄 | 🏗️ |
-| Todo CRUD | ✅ | 🔄 | 🏗️ |
-| Advanced Features | ✅ | 🔄 | 🏗️ |
-| Documentation | ✅ | 🔄 | 🏗️ |
+| Auth System | ✅ | 🔄 | ✅ |
+| Todo CRUD | ✅ | 🔄 | ✅ |
+| Advanced Features | ✅ | 🔄 | ✅ |
+| Documentation | ✅ | 🔄 | ✅ |
 | Tests | 🔄 | 🏗️ | 🏗️ |
-| Deployment | ✅ | 🔄 | 🏗️ |
+| Deployment | ✅ | 🔄 | ✅ |
 
 ---
 
@@ -382,6 +408,6 @@ Each backend implementation follows its own patterns and conventions:
 
 ---
 
-**Last Updated:** January 8, 2026  
-**Project Type:** Educational/Study Project  
+**Last Updated:** January 8, 2026
+**Project Type:** Educational/Study Project
 **License:** MIT
