@@ -1,4 +1,9 @@
 com/todo/config/SecurityConfig.class
-com/todo/TodoApplication.class
+com/todo/dto/RegisterRequest.class
 com/todo/model/User.class
 com/todo/repository/UserRepository.class
+com/todo/controller/AuthController$ErrorResponse.class
+com/todo/TodoApplication.class
+com/todo/service/UserService.class
+com/todo/controller/AuthController.class
+com/todo/dto/UserResponse.class
