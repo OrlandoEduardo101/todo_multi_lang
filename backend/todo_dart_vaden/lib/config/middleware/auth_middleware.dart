@@ -62,7 +62,7 @@ class AuthMiddleware {
 }
 
 /// Extract user ID from request context
-int? getUserIdFromContext(Request request) => request.context['user_id'] as int?;
+String? getUserIdFromContext(Request request) => request.context['user_id'] as String?;
 
 /// Extract token from request context
 String? getTokenFromContext(Request request) => request.context['token'] as String?;

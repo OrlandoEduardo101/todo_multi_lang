@@ -1,10 +1,10 @@
 import 'package:drift/drift.dart';
+import 'package:drift_postgres/drift_postgres.dart';
 import 'package:vaden/vaden.dart';
 import 'package:vaden_security/vaden_security.dart';
 
 import '../../../config/database/database.dart';
 import '../../database/daos/user_dao.dart';
-import '../../database/tables/users_table.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../../dto/user_dto.dart';
@@ -17,7 +17,7 @@ class UserRepositoryImpl implements UserRepository {
   final PasswordEncoder _passwordEncoder;
 
   @override
-  Future<UserProfile?> findById(int id) async {
+  Future<UserProfile?> findById(String id) async {
     try {
       final user = await _userDao.findById(id);
       return user != null ? _mapToUserProfile(user) : null;
@@ -40,6 +40,16 @@ class UserRepositoryImpl implements UserRepository {
   Future<User?> findEntityByEmail(String email) async {
     try {
       final user = await _userDao.findByEmail(email);
+      return user != null ? _mapToUserEntity(user) : null;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<User?> findEntityById(String id) async {
+    try {
+      final user = await _userDao.findById(id);
       return user != null ? _mapToUserEntity(user) : null;
     } catch (e) {
       rethrow;
@@ -72,13 +82,14 @@ class UserRepositoryImpl implements UserRepository {
       final now = DateTime.now();
 
       final companion = UsersTableCompanion(
+        name: Value(_buildDisplayName(request.firstName, request.lastName, request.email)),
         firstName: Value(request.firstName),
         lastName: Value(request.lastName),
         email: Value(request.email),
         password: Value(hashedPassword),
         roles: Value(request.roles),
-        createdAt: Value(now),
-        updatedAt: Value(now),
+        createdAt: Value(PgDateTime(now)),
+        updatedAt: Value(PgDateTime(now)),
       );
 
       final id = await _userDao.createUser(companion);
@@ -90,14 +101,17 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<UserProfile?> update(int id, UpdateUserRequest request) async {
+  Future<UserProfile?> update(String id, UpdateUserRequest request) async {
     try {
       final updates = UsersTableCompanion(
-        firstName: request.firstName != null ? Value(request.firstName!) : const Value.absent(),
-        lastName: request.lastName != null ? Value(request.lastName!) : const Value.absent(),
+        name: (request.firstName != null || request.lastName != null)
+            ? Value(_buildDisplayName(request.firstName ?? '', request.lastName ?? '', request.email ?? ''))
+            : const Value.absent(),
+        firstName: request.firstName != null ? Value(request.firstName) : const Value.absent(),
+        lastName: request.lastName != null ? Value(request.lastName) : const Value.absent(),
         email: request.email != null ? Value(request.email!) : const Value.absent(),
         roles: request.roles != null ? Value(request.roles!) : const Value.absent(),
-        updatedAt: Value(DateTime.now()),
+        updatedAt: Value(PgDateTime(DateTime.now())),
       );
 
       final success = await _userDao.updateUser(id, updates);
@@ -113,7 +127,7 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<bool> delete(int id) async {
+  Future<bool> delete(String id) async {
     try {
       return await _userDao.softDelete(id);
     } catch (e) {
@@ -123,24 +137,32 @@ class UserRepositoryImpl implements UserRepository {
 
   /// Map Drift UsersTableData to UserProfile DTO
   UserProfile _mapToUserProfile(UsersTableData? user) => UserProfile(
-    id: user?.id ?? 0,
+    id: user?.id.toString() ?? '',
     firstName: user?.firstName ?? '',
     lastName: user?.lastName ?? '',
     email: user?.email ?? '',
     roles: user?.roles ?? [],
-    createdAt: user?.createdAt ?? DateTime.now(),
-    updatedAt: user?.updatedAt ?? DateTime.now(),
+    createdAt: user?.createdAt.toDateTime() ?? DateTime.now(),
+    updatedAt: user?.updatedAt.toDateTime() ?? DateTime.now(),
   );
 
   User _mapToUserEntity(UsersTableData? user) => User(
-    id: user?.id ?? 0,
+    id: user?.id.toString() ?? '',
     firstName: user?.firstName ?? '',
     lastName: user?.lastName ?? '',
     email: user?.email ?? '',
     password: user?.password ?? '',
     roles: user?.roles ?? [],
-    createdAt: user?.createdAt ?? DateTime.now(),
-    updatedAt: user?.updatedAt ?? DateTime.now(),
-    deletedAt: user?.deletedAt,
+    createdAt: user?.createdAt.toDateTime() ?? DateTime.now(),
+    updatedAt: user?.updatedAt.toDateTime() ?? DateTime.now(),
+    deletedAt: user?.deletedAt?.toDateTime(),
   );
+
+  String _buildDisplayName(String firstName, String lastName, String email) {
+    final merged = '${firstName.trim()} ${lastName.trim()}'.trim();
+    if (merged.isNotEmpty) {
+      return merged;
+    }
+    return email.isNotEmpty ? email : 'User';
+  }
 }

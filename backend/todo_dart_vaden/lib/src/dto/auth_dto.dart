@@ -68,13 +68,13 @@ class UserAuthProfile {
   });
 
   factory UserAuthProfile.fromJson(Map<String, dynamic> json) => UserAuthProfile(
-    id: json['id'] as int,
+    id: json['id'] as String,
     email: json['email'] as String,
     firstName: json['firstName'] as String,
     lastName: json['lastName'] as String,
     roles: List<String>.from(json['roles'] as List),
   );
-  final int id;
+  final String id;
   final String email;
   final String firstName;
   final String lastName;

@@ -1,5 +1,7 @@
 package models
 
+import "github.com/google/uuid"
+
 // ErrorResponse representa uma resposta de erro da API
 type ErrorResponse struct {
 	Error string `json:"error" example:"Mensagem de erro"`
@@ -33,12 +35,12 @@ type TodoListResponse struct {
 
 // DeleteTodoResponse representa a resposta ao deletar um todo
 type DeleteTodoResponse struct {
-	Message string `json:"message" example:"Tarefa deletada com sucesso"`
-	ID      uint   `json:"id" example:"1"`
+	Message string    `json:"message" example:"Tarefa deletada com sucesso"`
+	ID      uuid.UUID `json:"id" example:"550e8400-e29b-41d4-a716-446655440000"`
 }
 
 // MeResponse representa a resposta da rota /me
 type MeResponse struct {
 	Message string `json:"message" example:"Área protegida"`
-	UserID  uint   `json:"user_id" example:"1"`
+	UserID  string `json:"user_id" example:"550e8400-e29b-41d4-a716-446655440000"`
 }

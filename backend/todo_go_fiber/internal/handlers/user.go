@@ -99,7 +99,12 @@ func Login(c *fiber.Ctx) error {
 
 	// Criar token JWT
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": user.ID,
+		"iss":     "vaden",
+		"aud":     []string{},
+		"sub":     user.ID.String(),
+		"user_id": user.ID.String(),
+		"email":   user.Email,
+		"roles":   []string{"user"},
 		"exp":     time.Now().Add(time.Hour * 72).Unix(), // expira em 3 dias
 	})
 
@@ -116,5 +121,10 @@ func Login(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"message": "Login realizado com sucesso",
 		"token":   tokenString,
+		"user": fiber.Map{
+			"id":    user.ID,
+			"name":  user.Name,
+			"email": user.Email,
+		},
 	})
 }

@@ -1,9 +1,8 @@
 import 'package:vaden/vaden.dart';
 
 import '../domain/repositories/todo_repository.dart';
-import '../dto/todo_dto.dart';
-import '../dto/user_dto.dart';
 import '../dto/common_dto.dart';
+import '../dto/todo_dto.dart';
 import '../services/user_details_service.dart';
 
 /// Todo Controller - handles todo management
@@ -25,7 +24,7 @@ class TodoController {
     content: ApiContent(type: 'application/json', schema: TodoPaginatedResponse),
   )
   @ApiResponse(500, description: 'Internal server error')
-  @Get('/')
+  @Get()
   Future<TodoPaginatedResponse> listTodos(
     @Context('user') CustomUserDetails currentUser,
     @Query('page') int? page,
@@ -72,7 +71,7 @@ class TodoController {
   @ApiResponse(404, description: 'Todo not found')
   @ApiResponse(500, description: 'Internal server error')
   @Get('/<id>')
-  Future<TodoProfile> getTodoById(@Param('id') int todoId) async {
+  Future<TodoProfile> getTodoById(@Param('id') String todoId) async {
     try {
       final todo = await todoRepository.findById(todoId);
       if (todo == null) {
@@ -97,7 +96,7 @@ class TodoController {
   )
   @ApiResponse(400, description: 'Invalid request data')
   @ApiResponse(500, description: 'Internal server error')
-  @Post('/')
+  @Post()
   Future<TodoProfile> createTodo(@Context('user') CustomUserDetails currentUser, @Body() CreateTodoRequest data) async {
     try {
       return await todoRepository.create(currentUser.id, data);
@@ -118,7 +117,7 @@ class TodoController {
   @ApiResponse(404, description: 'Todo not found')
   @ApiResponse(500, description: 'Internal server error')
   @Put('/<id>')
-  Future<TodoProfile> updateTodo(@Param('id') int todoId, @Body() UpdateTodoRequest updateData) async {
+  Future<TodoProfile> updateTodo(@Param('id') String todoId, @Body() UpdateTodoRequest updateData) async {
     try {
       final todo = await todoRepository.update(todoId, updateData);
       if (todo == null) {
@@ -143,7 +142,7 @@ class TodoController {
   @ApiResponse(404, description: 'Todo not found')
   @ApiResponse(500, description: 'Internal server error')
   @Delete('/<id>')
-  Future<StatusResponse> deleteTodo(@Param('id') int todoId) async {
+  Future<StatusResponse> deleteTodo(@Param('id') String todoId) async {
     try {
       final deleted = await todoRepository.delete(todoId);
       if (!deleted) {

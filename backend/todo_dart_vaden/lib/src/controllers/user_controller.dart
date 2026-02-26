@@ -1,9 +1,8 @@
 import 'package:vaden/vaden.dart';
 
 import '../domain/repositories/user_repository.dart';
-import '../dto/todo_dto.dart';
-import '../dto/user_dto.dart';
 import '../dto/common_dto.dart';
+import '../dto/user_dto.dart';
 
 /// User Controller - handles user management
 @Api(tag: 'Users', description: 'User management endpoints')
@@ -20,7 +19,7 @@ class UserController {
     content: ApiContent(type: 'application/json', schema: UserPaginatedResponse),
   )
   @ApiResponse(500, description: 'Internal server error')
-  @Get('/')
+  @Get()
   Future<UserPaginatedResponse> listUsers(@Query('page') int? page, @Query('limit') int? limit) async {
     try {
       final pageNum = page ?? 1;
@@ -47,7 +46,7 @@ class UserController {
   @ApiResponse(404, description: 'User not found')
   @ApiResponse(500, description: 'Internal server error')
   @Get('/<id>')
-  Future<UserProfile> getUserById(@Param('id') int userId) async {
+  Future<UserProfile> getUserById(@Param('id') String userId) async {
     try {
       final user = await userRepository.findById(userId);
       if (user == null) {
@@ -70,7 +69,7 @@ class UserController {
   )
   @ApiResponse(400, description: 'Invalid request data')
   @ApiResponse(500, description: 'Internal server error')
-  @Post('/')
+  @Post()
   Future<UserProfile> createUser(@Body() CreateUserRequest data) async {
     try {
       return await userRepository.create(data);
@@ -90,7 +89,7 @@ class UserController {
   @ApiResponse(404, description: 'User not found')
   @ApiResponse(500, description: 'Internal server error')
   @Put('/<id>')
-  Future<UserProfile> updateUser(@Param('id') int userId, @Body() UpdateUserRequest updateData) async {
+  Future<UserProfile> updateUser(@Param('id') String userId, @Body() UpdateUserRequest updateData) async {
     try {
       final user = await userRepository.update(userId, updateData);
       if (user == null) {
@@ -115,7 +114,7 @@ class UserController {
   @ApiResponse(404, description: 'User not found')
   @ApiResponse(500, description: 'Internal server error')
   @Delete('/<id>')
-  Future<StatusResponse> deleteUser(@Param('id') int userId) async {
+  Future<StatusResponse> deleteUser(@Param('id') String userId) async {
     try {
       final deleted = await userRepository.delete(userId);
       if (!deleted) {

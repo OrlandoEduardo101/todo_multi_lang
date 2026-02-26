@@ -67,10 +67,10 @@ class AuthService {
   );
 
   /// Decode placeholder token format: placeholder_access_token_<userId>
-  int? getUserIdFromToken(String token) {
+  String? getUserIdFromToken(String token) {
     final parts = token.split('_');
     if (parts.length < 4) return null;
-    return int.tryParse(parts.last);
+    return parts.last;
   }
 }
 

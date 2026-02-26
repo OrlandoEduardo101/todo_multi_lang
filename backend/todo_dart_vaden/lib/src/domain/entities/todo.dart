@@ -10,8 +10,8 @@ class Todo {
     this.description,
     this.deletedAt,
   });
-  final int id;
-  final int userId;
+  final String id;
+  final String userId;
   final String title;
   final String? description;
   final bool completed;

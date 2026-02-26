@@ -18,7 +18,8 @@ class AppDatabase extends _$AppDatabase {
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) async {
-      await m.createAll();
+      // Schema is provisioned by docker/init.sql and shared across backends.
+      // Keep onCreate as no-op to avoid creating parallel tables via Drift.
     },
     onUpgrade: (m, from, to) async {
       // Handle migrations if needed

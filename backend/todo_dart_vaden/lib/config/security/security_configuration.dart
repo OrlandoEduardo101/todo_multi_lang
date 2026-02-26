@@ -1,6 +1,7 @@
+import 'dart:io';
+
 import 'package:vaden/vaden.dart';
 import 'package:vaden_security/vaden_security.dart';
-import 'dart:io';
 
 /// Security configuration (Vaden style) with beans for encoder, JWT, and HTTP security.
 @Configuration()
@@ -17,10 +18,10 @@ class SecurityConfiguration {
   @Bean()
   JwtService jwtService(ApplicationSettings settings) {
     final secret =
+        Platform.environment['JWT_SECRET'] ??
         (settings['jwt.secret'] as String?) ??
         (settings['jwt']?['secret'] as String?) ??
-        Platform.environment['JWT_SECRET'] ??
-        'change-me-in-prod';
+        'shared-dev-jwt-secret-32-characters-minimum-123456';
 
     final expRaw =
         settings['jwt.expirationHours'] ??
@@ -28,8 +29,10 @@ class SecurityConfiguration {
         Platform.environment['JWT_EXPIRATION_HOURS'];
     final exp = expRaw is int ? expRaw : int.tryParse(expRaw?.toString() ?? '') ?? 72;
 
-    // Instantiate JwtService directly with secret and expiration
-    return JwtService(secret: secret);
+    return JwtService(
+      secret: secret,
+      tokenValidity: Duration(hours: exp),
+    );
   }
 
   @Bean()

@@ -15,16 +15,16 @@ class TodoProfile {
   });
 
   factory TodoProfile.fromJson(Map<String, dynamic> json) => TodoProfile(
-    id: json['id'] as int,
-    userId: json['userId'] as int,
+    id: json['id'] as String,
+    userId: json['userId'] as String,
     title: json['title'] as String,
     description: json['description'] as String?,
     completed: json['completed'] as bool,
     createdAt: DateTime.parse(json['createdAt'] as String),
     updatedAt: DateTime.parse(json['updatedAt'] as String),
   );
-  final int id;
-  final int userId;
+  final String id;
+  final String userId;
   final String title;
   final String? description;
   final bool completed;

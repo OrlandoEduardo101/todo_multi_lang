@@ -41,8 +41,18 @@ func Protected() fiber.Handler {
 			})
 		}
 
-		// Recupera o ID do usuário
-		userID := uint(claims["user_id"].(float64))
+		// Recupera o ID do usuário (UUID como string)
+		userID, ok := claims["user_id"].(string)
+		if !ok || userID == "" {
+			// Compatibilidade com tokens que usam claim padrão "sub"
+			sub, subOk := claims["sub"].(string)
+			if !subOk || sub == "" {
+				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+					"error": "Token inválido: user_id/sub ausente",
+				})
+			}
+			userID = sub
+		}
 
 		// Anexa o ID no contexto
 		c.Locals("user_id", userID)

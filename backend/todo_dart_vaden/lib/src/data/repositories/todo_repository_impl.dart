@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:drift_postgres/drift_postgres.dart';
 import 'package:vaden/vaden.dart';
 
 import '../../../config/database/database.dart';
@@ -13,7 +14,7 @@ class TodoRepositoryImpl implements TodoRepository {
   final TodoDao _todoDao;
 
   @override
-  Future<TodoProfile?> findById(int id) async {
+  Future<TodoProfile?> findById(String id) async {
     try {
       final todo = await _todoDao.getById(id);
       return todo != null ? _mapToTodoProfile(todo) : null;
@@ -24,7 +25,7 @@ class TodoRepositoryImpl implements TodoRepository {
 
   @override
   Future<List<TodoProfile>> findByUserId(
-    int userId, {
+    String userId, {
     int page = 1,
     int limit = 10,
     String? search,
@@ -49,7 +50,7 @@ class TodoRepositoryImpl implements TodoRepository {
   }
 
   @override
-  Future<int> getTotalCountByUserId(int userId, {String? search, bool? completed}) async {
+  Future<int> getTotalCountByUserId(String userId, {String? search, bool? completed}) async {
     try {
       return await _todoDao.countByUserId(userId, search: search, completed: completed);
     } catch (e) {
@@ -58,16 +59,16 @@ class TodoRepositoryImpl implements TodoRepository {
   }
 
   @override
-  Future<TodoProfile> create(int userId, CreateTodoRequest request) async {
+  Future<TodoProfile> create(String userId, CreateTodoRequest request) async {
     try {
       final now = DateTime.now();
       final companion = TodosTableCompanion(
-        userId: Value(userId),
+        userId: Value(UuidValue.fromString(userId)),
         title: Value(request.title),
         description: request.description != null ? Value(request.description) : const Value.absent(),
         completed: const Value(false),
-        createdAt: Value(now),
-        updatedAt: Value(now),
+        createdAt: Value(PgDateTime(now)),
+        updatedAt: Value(PgDateTime(now)),
       );
 
       final id = await _todoDao.createTodo(companion);
@@ -79,13 +80,13 @@ class TodoRepositoryImpl implements TodoRepository {
   }
 
   @override
-  Future<TodoProfile?> update(int id, UpdateTodoRequest request) async {
+  Future<TodoProfile?> update(String id, UpdateTodoRequest request) async {
     try {
       final updates = TodosTableCompanion(
         title: request.title != null ? Value(request.title!) : const Value.absent(),
         description: request.description != null ? Value(request.description) : const Value.absent(),
         completed: request.completed != null ? Value(request.completed!) : const Value.absent(),
-        updatedAt: Value(DateTime.now()),
+        updatedAt: Value(PgDateTime(DateTime.now())),
       );
 
       final success = await _todoDao.updateTodo(id, updates);
@@ -101,7 +102,7 @@ class TodoRepositoryImpl implements TodoRepository {
   }
 
   @override
-  Future<bool> delete(int id) async {
+  Future<bool> delete(String id) async {
     try {
       return await _todoDao.softDelete(id);
     } catch (e) {
@@ -111,12 +112,12 @@ class TodoRepositoryImpl implements TodoRepository {
 
   /// Map Drift TodosTableData to TodoProfile DTO
   TodoProfile _mapToTodoProfile(TodosTableData? todo) => TodoProfile(
-    id: todo?.id ?? 0,
-    userId: todo?.userId ?? 0,
+    id: todo?.id.toString() ?? '',
+    userId: todo?.userId.toString() ?? '',
     title: todo?.title ?? '',
     description: todo?.description,
     completed: todo?.completed ?? false,
-    createdAt: todo?.createdAt ?? DateTime.now(),
-    updatedAt: todo?.updatedAt ?? DateTime.now(),
+    createdAt: todo?.createdAt.toDateTime() ?? DateTime.now(),
+    updatedAt: todo?.updatedAt.toDateTime() ?? DateTime.now(),
   );
 }

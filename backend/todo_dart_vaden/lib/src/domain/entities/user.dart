@@ -11,7 +11,7 @@ class User {
     required this.updatedAt,
     this.deletedAt,
   });
-  final int id;
+  final String id;
   final String firstName;
   final String lastName;
   final String email;

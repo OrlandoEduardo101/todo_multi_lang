@@ -1,12 +1,13 @@
 import 'dart:io' show Platform;
+
 import 'package:drift/drift.dart';
 import 'package:drift_postgres/drift_postgres.dart';
 import 'package:postgres/postgres.dart' as pg;
 import 'package:vaden/vaden.dart';
 
-import 'database.dart';
 import '../../src/database/daos/todo_dao.dart';
 import '../../src/database/daos/user_dao.dart';
+import 'database.dart';
 
 @Configuration()
 class DriftConfiguration {

@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:drift_postgres/drift_postgres.dart';
 import '../../../config/database/database.dart';
 import '../tables/users_table.dart';
 
@@ -20,23 +21,30 @@ class UserDao extends DatabaseAccessor<AppDatabase> {
       (db.select(db.usersTable)..where((u) => u.email.equals(email) & u.deletedAt.isNull())).getSingleOrNull();
 
   /// Get user by ID
-  Future<UsersTableData?> findById(int id) =>
-      (db.select(db.usersTable)..where((u) => u.id.equals(id) & u.deletedAt.isNull())).getSingleOrNull();
+  Future<UsersTableData?> findById(String id) => (db.select(
+    db.usersTable,
+  )..where((u) => u.id.equals(UuidValue.fromString(id)) & u.deletedAt.isNull())).getSingleOrNull();
 
   /// Create user
-  Future<int> createUser(UsersTableCompanion user) => db.into(db.usersTable).insert(user);
+  Future<String> createUser(UsersTableCompanion user) async {
+    await db.into(db.usersTable).insert(user);
+    final created = await findByEmail(user.email.value);
+    return created?.id.toString() ?? '';
+  }
 
   /// Update user
-  Future<bool> updateUser(int id, UsersTableCompanion updates) async {
-    final updated = await (db.update(db.usersTable)..where((u) => u.id.equals(id))).write(updates);
+  Future<bool> updateUser(String id, UsersTableCompanion updates) async {
+    final updated = await (db.update(
+      db.usersTable,
+    )..where((u) => u.id.equals(UuidValue.fromString(id)))).write(updates);
     return updated > 0;
   }
 
   /// Soft delete
-  Future<bool> softDelete(int id) async {
-    final updated = await (db.update(
-      db.usersTable,
-    )..where((u) => u.id.equals(id))).write(UsersTableCompanion(deletedAt: Value(DateTime.now())));
+  Future<bool> softDelete(String id) async {
+    final updated = await (db.update(db.usersTable)..where((u) => u.id.equals(UuidValue.fromString(id)))).write(
+      UsersTableCompanion(deletedAt: Value(PgDateTime(DateTime.now()))),
+    );
     return updated > 0;
   }
 

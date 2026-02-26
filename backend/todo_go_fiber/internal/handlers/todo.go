@@ -6,6 +6,7 @@ import (
 	"todo_go_fiber/internal/models"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 // GetTodos retorna uma lista de tarefas do usuário com suporte a paginação, filtros e ordenação
@@ -24,7 +25,7 @@ import (
 // @Router       /api/todos [get]
 // @Security     BearerAuth
 func GetTodos(c *fiber.Ctx) error {
-	userID := c.Locals("user_id").(uint)
+	userID := c.Locals("user_id").(string)
 
 	// Paginação
 	page := c.QueryInt("page", 1)
@@ -109,7 +110,8 @@ func GetTodos(c *fiber.Ctx) error {
 }
 
 type CreateTodoInput struct {
-	Title string `json:"title"`
+	Title       string  `json:"title"`
+	Description *string `json:"description"`
 }
 
 // CreateTodo cria uma nova tarefa para o usuário autenticado
@@ -125,7 +127,11 @@ type CreateTodoInput struct {
 // @Router       /api/todos [post]
 // @Security     BearerAuth
 func CreateTodo(c *fiber.Ctx) error {
-	userID := c.Locals("user_id").(uint)
+	userID := c.Locals("user_id").(string)
+	parsedUserID, err := uuid.Parse(userID)
+	if err != nil {
+		return c.Status(401).JSON(fiber.Map{"error": "Token inválido"})
+	}
 
 	var input CreateTodoInput
 	if err := c.BodyParser(&input); err != nil {
@@ -137,8 +143,9 @@ func CreateTodo(c *fiber.Ctx) error {
 	}
 
 	todo := models.Todo{
-		UserID: userID,
-		Title:  input.Title,
+		UserID:      parsedUserID,
+		Title:       input.Title,
+		Description: input.Description,
 	}
 
 	if err := database.DB.Create(&todo).Error; err != nil {
@@ -149,8 +156,9 @@ func CreateTodo(c *fiber.Ctx) error {
 }
 
 type UpdateTodoInput struct {
-	Title     *string `json:"title"`
-	Completed *bool   `json:"completed"`
+	Title       *string `json:"title"`
+	Description *string `json:"description"`
+	Completed   *bool   `json:"completed"`
 }
 
 // UpdateTodo atualiza uma tarefa existente do usuário autenticado
@@ -168,7 +176,7 @@ type UpdateTodoInput struct {
 // @Router       /api/todos/{id} [put]
 // @Security     BearerAuth
 func UpdateTodo(c *fiber.Ctx) error {
-	userID := c.Locals("user_id").(uint)
+	userID := c.Locals("user_id").(string)
 	todoID := c.Params("id")
 
 	var todo models.Todo
@@ -185,6 +193,9 @@ func UpdateTodo(c *fiber.Ctx) error {
 
 	if input.Title != nil {
 		todo.Title = *input.Title
+	}
+	if input.Description != nil {
+		todo.Description = input.Description
 	}
 	if input.Completed != nil {
 		todo.Completed = *input.Completed
@@ -211,7 +222,7 @@ func UpdateTodo(c *fiber.Ctx) error {
 // @Router       /api/todos/{id} [delete]
 // @Security     BearerAuth
 func DeleteTodo(c *fiber.Ctx) error {
-	userID := c.Locals("user_id").(uint)
+	userID := c.Locals("user_id").(string)
 	todoID := c.Params("id")
 
 	var todo models.Todo

@@ -12,7 +12,8 @@ class UserDetailsServiceImpl implements UserDetailsService {
   @override
   Future<UserDetails?> loadUserByUsername(String username) async {
     print('🔍 UserDetailsService: Buscando usuário: $username');
-    final user = await userRepository.findEntityByEmail(username);
+    var user = await userRepository.findEntityByEmail(username);
+    user ??= await userRepository.findEntityById(username);
     if (user == null) {
       print('❌ UserDetailsService: Usuário não encontrado');
       return null;
@@ -51,7 +52,7 @@ class CustomUserDetails extends UserDetails {
     this.updatedAt,
   });
 
-  final int id;
+  final String id;
   final String firstName;
   final String lastName;
   final DateTime? createdAt;

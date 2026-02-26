@@ -16,7 +16,7 @@ class UserProfile {
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) => UserProfile(
-    id: json['id'] as int,
+    id: json['id'] as String,
     firstName: json['firstName'] as String,
     lastName: json['lastName'] as String,
     email: json['email'] as String,
@@ -24,7 +24,7 @@ class UserProfile {
     createdAt: DateTime.parse(json['createdAt'] as String),
     updatedAt: DateTime.parse(json['updatedAt'] as String),
   );
-  final int id;
+  final String id;
   final String firstName;
   final String lastName;
   final String email;

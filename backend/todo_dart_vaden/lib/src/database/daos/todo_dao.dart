@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:drift_postgres/drift_postgres.dart';
 import '../../../config/database/database.dart';
 import '../tables/todos_table.dart';
 
@@ -10,7 +11,7 @@ class TodoDao extends DatabaseAccessor<AppDatabase> {
 
   /// Get todos by user ID with advanced filtering
   Future<List<TodosTableData>> getByUserId(
-    int userId, {
+    String userId, {
     int page = 1,
     int limit = 10,
     String? search,
@@ -20,7 +21,8 @@ class TodoDao extends DatabaseAccessor<AppDatabase> {
   }) {
     final offset = (page - 1) * limit;
 
-    var query = db.select(db.todosTable)..where((t) => t.userId.equals(userId) & t.deletedAt.isNull());
+    var query = db.select(db.todosTable)
+      ..where((t) => t.userId.equals(UuidValue.fromString(userId)) & t.deletedAt.isNull());
 
     // Add search filter
     if (search != null && search.isNotEmpty) {
@@ -46,29 +48,44 @@ class TodoDao extends DatabaseAccessor<AppDatabase> {
   }
 
   /// Get todo by ID
-  Future<TodosTableData?> getById(int id) =>
-      (db.select(db.todosTable)..where((t) => t.id.equals(id) & t.deletedAt.isNull())).getSingleOrNull();
+  Future<TodosTableData?> getById(String id) => (db.select(
+    db.todosTable,
+  )..where((t) => t.id.equals(UuidValue.fromString(id)) & t.deletedAt.isNull())).getSingleOrNull();
 
   /// Create todo
-  Future<int> createTodo(TodosTableCompanion todo) => db.into(db.todosTable).insert(todo);
+  Future<String> createTodo(TodosTableCompanion todo) async {
+    await db.into(db.todosTable).insert(todo);
+    final created =
+        await (db.select(db.todosTable)
+              ..where(
+                (t) => t.userId.equals(todo.userId.value) & t.title.equals(todo.title.value) & t.deletedAt.isNull(),
+              )
+              ..orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc)])
+              ..limit(1))
+            .getSingleOrNull();
+    return created?.id.toString() ?? '';
+  }
 
   /// Update todo
-  Future<bool> updateTodo(int id, TodosTableCompanion updates) async {
-    final updated = await (db.update(db.todosTable)..where((t) => t.id.equals(id))).write(updates);
+  Future<bool> updateTodo(String id, TodosTableCompanion updates) async {
+    final updated = await (db.update(
+      db.todosTable,
+    )..where((t) => t.id.equals(UuidValue.fromString(id)))).write(updates);
     return updated > 0;
   }
 
   /// Soft delete
-  Future<bool> softDelete(int id) async {
-    final updated = await (db.update(
-      db.todosTable,
-    )..where((t) => t.id.equals(id))).write(TodosTableCompanion(deletedAt: Value(DateTime.now())));
+  Future<bool> softDelete(String id) async {
+    final updated = await (db.update(db.todosTable)..where((t) => t.id.equals(UuidValue.fromString(id)))).write(
+      TodosTableCompanion(deletedAt: Value(PgDateTime(DateTime.now()))),
+    );
     return updated > 0;
   }
 
   /// Count todos for user
-  Future<int> countByUserId(int userId, {String? search, bool? completed}) async {
-    var query = db.select(db.todosTable)..where((t) => t.userId.equals(userId) & t.deletedAt.isNull());
+  Future<int> countByUserId(String userId, {String? search, bool? completed}) async {
+    var query = db.select(db.todosTable)
+      ..where((t) => t.userId.equals(UuidValue.fromString(userId)) & t.deletedAt.isNull());
 
     if (search != null && search.isNotEmpty) {
       query = query..where((t) => t.title.like('%$search%'));

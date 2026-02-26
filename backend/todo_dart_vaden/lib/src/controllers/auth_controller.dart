@@ -9,9 +9,10 @@ import '../dto/user_dto.dart';
 @Api(tag: 'Authentication', description: 'User authentication endpoints')
 @Controller('/auth')
 class AppAuthController {
-  AppAuthController({required this.userRepository, required this.passwordEncoder});
+  AppAuthController({required this.userRepository, required this.passwordEncoder, required this.jwtService});
   final UserRepository userRepository;
   final PasswordEncoder passwordEncoder;
+  final JwtService jwtService;
 
   /// POST /auth/register - Register new user
   @ApiOperation(summary: 'Register new user', description: 'Create a new user account with email and password')
@@ -93,11 +94,13 @@ class AppAuthController {
         throw const ResponseException(401, 'Invalid credentials');
       }
 
-      // TODO: Use JwtService from vaden_security to generate token
-      final token = 'token_${userEntity.id}_${DateTime.now().millisecondsSinceEpoch}';
+      final tokenization = jwtService.generateToken(
+        UserDetails(username: userEntity.id, password: userEntity.password, roles: userEntity.roles),
+        claims: {'user_id': userEntity.id, 'email': userEntity.email},
+      );
 
       return AuthResponse(
-        token: token,
+        token: tokenization.accessToken,
         expiresIn: 259200, // 72 hours
         user: UserAuthProfile(
           id: userEntity.id,

@@ -11,16 +11,22 @@ class $UsersTableTable extends UsersTable
   $UsersTableTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<UuidValue> id = GeneratedColumn<UuidValue>(
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
+    type: PgTypes.uuid,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    defaultValue: genRandomUuid(),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _firstNameMeta = const VerificationMeta(
     'firstName',
@@ -29,9 +35,9 @@ class $UsersTableTable extends UsersTable
   late final GeneratedColumn<String> firstName = GeneratedColumn<String>(
     'first_name',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _lastNameMeta = const VerificationMeta(
     'lastName',
@@ -40,9 +46,9 @@ class $UsersTableTable extends UsersTable
   late final GeneratedColumn<String> lastName = GeneratedColumn<String>(
     'last_name',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _emailMeta = const VerificationMeta('email');
   @override
@@ -78,40 +84,44 @@ class $UsersTableTable extends UsersTable
     'createdAt',
   );
   @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-    'created_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    clientDefault: DateTime.now,
-  );
+  late final GeneratedColumn<PgDateTime> createdAt =
+      GeneratedColumn<PgDateTime>(
+        'created_at',
+        aliasedName,
+        false,
+        type: PgTypes.timestampNoTimezone,
+        requiredDuringInsert: false,
+        clientDefault: () => PgDateTime(DateTime.now()),
+      );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
   @override
-  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-    'updated_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    clientDefault: DateTime.now,
-  );
+  late final GeneratedColumn<PgDateTime> updatedAt =
+      GeneratedColumn<PgDateTime>(
+        'updated_at',
+        aliasedName,
+        false,
+        type: PgTypes.timestampNoTimezone,
+        requiredDuringInsert: false,
+        clientDefault: () => PgDateTime(DateTime.now()),
+      );
   static const VerificationMeta _deletedAtMeta = const VerificationMeta(
     'deletedAt',
   );
   @override
-  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
-    'deleted_at',
-    aliasedName,
-    true,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-  );
+  late final GeneratedColumn<PgDateTime> deletedAt =
+      GeneratedColumn<PgDateTime>(
+        'deleted_at',
+        aliasedName,
+        true,
+        type: PgTypes.timestampNoTimezone,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
+    name,
     firstName,
     lastName,
     email,
@@ -125,7 +135,7 @@ class $UsersTableTable extends UsersTable
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'users_table';
+  static const String $name = 'users';
   @override
   VerificationContext validateIntegrity(
     Insertable<UsersTableData> instance, {
@@ -136,21 +146,25 @@ class $UsersTableTable extends UsersTable
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
     if (data.containsKey('first_name')) {
       context.handle(
         _firstNameMeta,
         firstName.isAcceptableOrUnknown(data['first_name']!, _firstNameMeta),
       );
-    } else if (isInserting) {
-      context.missing(_firstNameMeta);
     }
     if (data.containsKey('last_name')) {
       context.handle(
         _lastNameMeta,
         lastName.isAcceptableOrUnknown(data['last_name']!, _lastNameMeta),
       );
-    } else if (isInserting) {
-      context.missing(_lastNameMeta);
     }
     if (data.containsKey('email')) {
       context.handle(
@@ -196,17 +210,21 @@ class $UsersTableTable extends UsersTable
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return UsersTableData(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        PgTypes.uuid,
         data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
       )!,
       firstName: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}first_name'],
-      )!,
+      ),
       lastName: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}last_name'],
-      )!,
+      ),
       email: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}email'],
@@ -222,15 +240,15 @@ class $UsersTableTable extends UsersTable
         )!,
       ),
       createdAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
+        PgTypes.timestampNoTimezone,
         data['${effectivePrefix}created_at'],
       )!,
       updatedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
+        PgTypes.timestampNoTimezone,
         data['${effectivePrefix}updated_at'],
       )!,
       deletedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
+        PgTypes.timestampNoTimezone,
         data['${effectivePrefix}deleted_at'],
       ),
     );
@@ -246,19 +264,21 @@ class $UsersTableTable extends UsersTable
 }
 
 class UsersTableData extends DataClass implements Insertable<UsersTableData> {
-  final int id;
-  final String firstName;
-  final String lastName;
+  final UuidValue id;
+  final String name;
+  final String? firstName;
+  final String? lastName;
   final String email;
   final String password;
   final List<String> roles;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final DateTime? deletedAt;
+  final PgDateTime createdAt;
+  final PgDateTime updatedAt;
+  final PgDateTime? deletedAt;
   const UsersTableData({
     required this.id,
-    required this.firstName,
-    required this.lastName,
+    required this.name,
+    this.firstName,
+    this.lastName,
     required this.email,
     required this.password,
     required this.roles,
@@ -269,9 +289,14 @@ class UsersTableData extends DataClass implements Insertable<UsersTableData> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['first_name'] = Variable<String>(firstName);
-    map['last_name'] = Variable<String>(lastName);
+    map['id'] = Variable<UuidValue>(id, PgTypes.uuid);
+    map['name'] = Variable<String>(name);
+    if (!nullToAbsent || firstName != null) {
+      map['first_name'] = Variable<String>(firstName);
+    }
+    if (!nullToAbsent || lastName != null) {
+      map['last_name'] = Variable<String>(lastName);
+    }
     map['email'] = Variable<String>(email);
     map['password'] = Variable<String>(password);
     {
@@ -279,10 +304,19 @@ class UsersTableData extends DataClass implements Insertable<UsersTableData> {
         $UsersTableTable.$converterroles.toSql(roles),
       );
     }
-    map['created_at'] = Variable<DateTime>(createdAt);
-    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['created_at'] = Variable<PgDateTime>(
+      createdAt,
+      PgTypes.timestampNoTimezone,
+    );
+    map['updated_at'] = Variable<PgDateTime>(
+      updatedAt,
+      PgTypes.timestampNoTimezone,
+    );
     if (!nullToAbsent || deletedAt != null) {
-      map['deleted_at'] = Variable<DateTime>(deletedAt);
+      map['deleted_at'] = Variable<PgDateTime>(
+        deletedAt,
+        PgTypes.timestampNoTimezone,
+      );
     }
     return map;
   }
@@ -290,8 +324,13 @@ class UsersTableData extends DataClass implements Insertable<UsersTableData> {
   UsersTableCompanion toCompanion(bool nullToAbsent) {
     return UsersTableCompanion(
       id: Value(id),
-      firstName: Value(firstName),
-      lastName: Value(lastName),
+      name: Value(name),
+      firstName: firstName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(firstName),
+      lastName: lastName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastName),
       email: Value(email),
       password: Value(password),
       roles: Value(roles),
@@ -309,47 +348,51 @@ class UsersTableData extends DataClass implements Insertable<UsersTableData> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return UsersTableData(
-      id: serializer.fromJson<int>(json['id']),
-      firstName: serializer.fromJson<String>(json['firstName']),
-      lastName: serializer.fromJson<String>(json['lastName']),
+      id: serializer.fromJson<UuidValue>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      firstName: serializer.fromJson<String?>(json['firstName']),
+      lastName: serializer.fromJson<String?>(json['lastName']),
       email: serializer.fromJson<String>(json['email']),
       password: serializer.fromJson<String>(json['password']),
       roles: serializer.fromJson<List<String>>(json['roles']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
-      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
-      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      createdAt: serializer.fromJson<PgDateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<PgDateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<PgDateTime?>(json['deletedAt']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'firstName': serializer.toJson<String>(firstName),
-      'lastName': serializer.toJson<String>(lastName),
+      'id': serializer.toJson<UuidValue>(id),
+      'name': serializer.toJson<String>(name),
+      'firstName': serializer.toJson<String?>(firstName),
+      'lastName': serializer.toJson<String?>(lastName),
       'email': serializer.toJson<String>(email),
       'password': serializer.toJson<String>(password),
       'roles': serializer.toJson<List<String>>(roles),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
-      'updatedAt': serializer.toJson<DateTime>(updatedAt),
-      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'createdAt': serializer.toJson<PgDateTime>(createdAt),
+      'updatedAt': serializer.toJson<PgDateTime>(updatedAt),
+      'deletedAt': serializer.toJson<PgDateTime?>(deletedAt),
     };
   }
 
   UsersTableData copyWith({
-    int? id,
-    String? firstName,
-    String? lastName,
+    UuidValue? id,
+    String? name,
+    Value<String?> firstName = const Value.absent(),
+    Value<String?> lastName = const Value.absent(),
     String? email,
     String? password,
     List<String>? roles,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    Value<DateTime?> deletedAt = const Value.absent(),
+    PgDateTime? createdAt,
+    PgDateTime? updatedAt,
+    Value<PgDateTime?> deletedAt = const Value.absent(),
   }) => UsersTableData(
     id: id ?? this.id,
-    firstName: firstName ?? this.firstName,
-    lastName: lastName ?? this.lastName,
+    name: name ?? this.name,
+    firstName: firstName.present ? firstName.value : this.firstName,
+    lastName: lastName.present ? lastName.value : this.lastName,
     email: email ?? this.email,
     password: password ?? this.password,
     roles: roles ?? this.roles,
@@ -360,6 +403,7 @@ class UsersTableData extends DataClass implements Insertable<UsersTableData> {
   UsersTableData copyWithCompanion(UsersTableCompanion data) {
     return UsersTableData(
       id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
       firstName: data.firstName.present ? data.firstName.value : this.firstName,
       lastName: data.lastName.present ? data.lastName.value : this.lastName,
       email: data.email.present ? data.email.value : this.email,
@@ -375,6 +419,7 @@ class UsersTableData extends DataClass implements Insertable<UsersTableData> {
   String toString() {
     return (StringBuffer('UsersTableData(')
           ..write('id: $id, ')
+          ..write('name: $name, ')
           ..write('firstName: $firstName, ')
           ..write('lastName: $lastName, ')
           ..write('email: $email, ')
@@ -390,6 +435,7 @@ class UsersTableData extends DataClass implements Insertable<UsersTableData> {
   @override
   int get hashCode => Object.hash(
     id,
+    name,
     firstName,
     lastName,
     email,
@@ -404,6 +450,7 @@ class UsersTableData extends DataClass implements Insertable<UsersTableData> {
       identical(this, other) ||
       (other is UsersTableData &&
           other.id == this.id &&
+          other.name == this.name &&
           other.firstName == this.firstName &&
           other.lastName == this.lastName &&
           other.email == this.email &&
@@ -415,17 +462,20 @@ class UsersTableData extends DataClass implements Insertable<UsersTableData> {
 }
 
 class UsersTableCompanion extends UpdateCompanion<UsersTableData> {
-  final Value<int> id;
-  final Value<String> firstName;
-  final Value<String> lastName;
+  final Value<UuidValue> id;
+  final Value<String> name;
+  final Value<String?> firstName;
+  final Value<String?> lastName;
   final Value<String> email;
   final Value<String> password;
   final Value<List<String>> roles;
-  final Value<DateTime> createdAt;
-  final Value<DateTime> updatedAt;
-  final Value<DateTime?> deletedAt;
+  final Value<PgDateTime> createdAt;
+  final Value<PgDateTime> updatedAt;
+  final Value<PgDateTime?> deletedAt;
+  final Value<int> rowid;
   const UsersTableCompanion({
     this.id = const Value.absent(),
+    this.name = const Value.absent(),
     this.firstName = const Value.absent(),
     this.lastName = const Value.absent(),
     this.email = const Value.absent(),
@@ -434,35 +484,40 @@ class UsersTableCompanion extends UpdateCompanion<UsersTableData> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   UsersTableCompanion.insert({
     this.id = const Value.absent(),
-    required String firstName,
-    required String lastName,
+    required String name,
+    this.firstName = const Value.absent(),
+    this.lastName = const Value.absent(),
     required String email,
     required String password,
     required List<String> roles,
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
-  }) : firstName = Value(firstName),
-       lastName = Value(lastName),
+    this.rowid = const Value.absent(),
+  }) : name = Value(name),
        email = Value(email),
        password = Value(password),
        roles = Value(roles);
   static Insertable<UsersTableData> custom({
-    Expression<int>? id,
+    Expression<UuidValue>? id,
+    Expression<String>? name,
     Expression<String>? firstName,
     Expression<String>? lastName,
     Expression<String>? email,
     Expression<String>? password,
     Expression<String>? roles,
-    Expression<DateTime>? createdAt,
-    Expression<DateTime>? updatedAt,
-    Expression<DateTime>? deletedAt,
+    Expression<PgDateTime>? createdAt,
+    Expression<PgDateTime>? updatedAt,
+    Expression<PgDateTime>? deletedAt,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (name != null) 'name': name,
       if (firstName != null) 'first_name': firstName,
       if (lastName != null) 'last_name': lastName,
       if (email != null) 'email': email,
@@ -471,22 +526,26 @@ class UsersTableCompanion extends UpdateCompanion<UsersTableData> {
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   UsersTableCompanion copyWith({
-    Value<int>? id,
-    Value<String>? firstName,
-    Value<String>? lastName,
+    Value<UuidValue>? id,
+    Value<String>? name,
+    Value<String?>? firstName,
+    Value<String?>? lastName,
     Value<String>? email,
     Value<String>? password,
     Value<List<String>>? roles,
-    Value<DateTime>? createdAt,
-    Value<DateTime>? updatedAt,
-    Value<DateTime?>? deletedAt,
+    Value<PgDateTime>? createdAt,
+    Value<PgDateTime>? updatedAt,
+    Value<PgDateTime?>? deletedAt,
+    Value<int>? rowid,
   }) {
     return UsersTableCompanion(
       id: id ?? this.id,
+      name: name ?? this.name,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       email: email ?? this.email,
@@ -495,6 +554,7 @@ class UsersTableCompanion extends UpdateCompanion<UsersTableData> {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -502,7 +562,10 @@ class UsersTableCompanion extends UpdateCompanion<UsersTableData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<UuidValue>(id.value, PgTypes.uuid);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
     }
     if (firstName.present) {
       map['first_name'] = Variable<String>(firstName.value);
@@ -522,13 +585,25 @@ class UsersTableCompanion extends UpdateCompanion<UsersTableData> {
       );
     }
     if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
+      map['created_at'] = Variable<PgDateTime>(
+        createdAt.value,
+        PgTypes.timestampNoTimezone,
+      );
     }
     if (updatedAt.present) {
-      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+      map['updated_at'] = Variable<PgDateTime>(
+        updatedAt.value,
+        PgTypes.timestampNoTimezone,
+      );
     }
     if (deletedAt.present) {
-      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+      map['deleted_at'] = Variable<PgDateTime>(
+        deletedAt.value,
+        PgTypes.timestampNoTimezone,
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -537,6 +612,7 @@ class UsersTableCompanion extends UpdateCompanion<UsersTableData> {
   String toString() {
     return (StringBuffer('UsersTableCompanion(')
           ..write('id: $id, ')
+          ..write('name: $name, ')
           ..write('firstName: $firstName, ')
           ..write('lastName: $lastName, ')
           ..write('email: $email, ')
@@ -544,7 +620,8 @@ class UsersTableCompanion extends UpdateCompanion<UsersTableData> {
           ..write('roles: $roles, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -558,27 +635,24 @@ class $TodosTableTable extends TodosTable
   $TodosTableTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<UuidValue> id = GeneratedColumn<UuidValue>(
     'id',
     aliasedName,
     false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
+    type: PgTypes.uuid,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
+    defaultValue: genRandomUuid(),
   );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
   @override
-  late final GeneratedColumn<int> userId = GeneratedColumn<int>(
+  late final GeneratedColumn<UuidValue> userId = GeneratedColumn<UuidValue>(
     'user_id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
+    type: PgTypes.uuid,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES users_table (id)',
+      'REFERENCES users (id)',
     ),
   );
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
@@ -617,37 +691,40 @@ class $TodosTableTable extends TodosTable
     'createdAt',
   );
   @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-    'created_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    clientDefault: DateTime.now,
-  );
+  late final GeneratedColumn<PgDateTime> createdAt =
+      GeneratedColumn<PgDateTime>(
+        'created_at',
+        aliasedName,
+        false,
+        type: PgTypes.timestampNoTimezone,
+        requiredDuringInsert: false,
+        clientDefault: () => PgDateTime(DateTime.now()),
+      );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
   @override
-  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-    'updated_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    clientDefault: DateTime.now,
-  );
+  late final GeneratedColumn<PgDateTime> updatedAt =
+      GeneratedColumn<PgDateTime>(
+        'updated_at',
+        aliasedName,
+        false,
+        type: PgTypes.timestampNoTimezone,
+        requiredDuringInsert: false,
+        clientDefault: () => PgDateTime(DateTime.now()),
+      );
   static const VerificationMeta _deletedAtMeta = const VerificationMeta(
     'deletedAt',
   );
   @override
-  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
-    'deleted_at',
-    aliasedName,
-    true,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-  );
+  late final GeneratedColumn<PgDateTime> deletedAt =
+      GeneratedColumn<PgDateTime>(
+        'deleted_at',
+        aliasedName,
+        true,
+        type: PgTypes.timestampNoTimezone,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -663,7 +740,7 @@ class $TodosTableTable extends TodosTable
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'todos_table';
+  static const String $name = 'todos';
   @override
   VerificationContext validateIntegrity(
     Insertable<TodosTableData> instance, {
@@ -733,11 +810,11 @@ class $TodosTableTable extends TodosTable
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return TodosTableData(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        PgTypes.uuid,
         data['${effectivePrefix}id'],
       )!,
       userId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        PgTypes.uuid,
         data['${effectivePrefix}user_id'],
       )!,
       title: attachedDatabase.typeMapping.read(
@@ -753,15 +830,15 @@ class $TodosTableTable extends TodosTable
         data['${effectivePrefix}completed'],
       )!,
       createdAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
+        PgTypes.timestampNoTimezone,
         data['${effectivePrefix}created_at'],
       )!,
       updatedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
+        PgTypes.timestampNoTimezone,
         data['${effectivePrefix}updated_at'],
       )!,
       deletedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
+        PgTypes.timestampNoTimezone,
         data['${effectivePrefix}deleted_at'],
       ),
     );
@@ -774,14 +851,14 @@ class $TodosTableTable extends TodosTable
 }
 
 class TodosTableData extends DataClass implements Insertable<TodosTableData> {
-  final int id;
-  final int userId;
+  final UuidValue id;
+  final UuidValue userId;
   final String title;
   final String? description;
   final bool completed;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final DateTime? deletedAt;
+  final PgDateTime createdAt;
+  final PgDateTime updatedAt;
+  final PgDateTime? deletedAt;
   const TodosTableData({
     required this.id,
     required this.userId,
@@ -795,17 +872,26 @@ class TodosTableData extends DataClass implements Insertable<TodosTableData> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['user_id'] = Variable<int>(userId);
+    map['id'] = Variable<UuidValue>(id, PgTypes.uuid);
+    map['user_id'] = Variable<UuidValue>(userId, PgTypes.uuid);
     map['title'] = Variable<String>(title);
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
     map['completed'] = Variable<bool>(completed);
-    map['created_at'] = Variable<DateTime>(createdAt);
-    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['created_at'] = Variable<PgDateTime>(
+      createdAt,
+      PgTypes.timestampNoTimezone,
+    );
+    map['updated_at'] = Variable<PgDateTime>(
+      updatedAt,
+      PgTypes.timestampNoTimezone,
+    );
     if (!nullToAbsent || deletedAt != null) {
-      map['deleted_at'] = Variable<DateTime>(deletedAt);
+      map['deleted_at'] = Variable<PgDateTime>(
+        deletedAt,
+        PgTypes.timestampNoTimezone,
+      );
     }
     return map;
   }
@@ -833,40 +919,40 @@ class TodosTableData extends DataClass implements Insertable<TodosTableData> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return TodosTableData(
-      id: serializer.fromJson<int>(json['id']),
-      userId: serializer.fromJson<int>(json['userId']),
+      id: serializer.fromJson<UuidValue>(json['id']),
+      userId: serializer.fromJson<UuidValue>(json['userId']),
       title: serializer.fromJson<String>(json['title']),
       description: serializer.fromJson<String?>(json['description']),
       completed: serializer.fromJson<bool>(json['completed']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
-      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
-      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      createdAt: serializer.fromJson<PgDateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<PgDateTime>(json['updatedAt']),
+      deletedAt: serializer.fromJson<PgDateTime?>(json['deletedAt']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'userId': serializer.toJson<int>(userId),
+      'id': serializer.toJson<UuidValue>(id),
+      'userId': serializer.toJson<UuidValue>(userId),
       'title': serializer.toJson<String>(title),
       'description': serializer.toJson<String?>(description),
       'completed': serializer.toJson<bool>(completed),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
-      'updatedAt': serializer.toJson<DateTime>(updatedAt),
-      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'createdAt': serializer.toJson<PgDateTime>(createdAt),
+      'updatedAt': serializer.toJson<PgDateTime>(updatedAt),
+      'deletedAt': serializer.toJson<PgDateTime?>(deletedAt),
     };
   }
 
   TodosTableData copyWith({
-    int? id,
-    int? userId,
+    UuidValue? id,
+    UuidValue? userId,
     String? title,
     Value<String?> description = const Value.absent(),
     bool? completed,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-    Value<DateTime?> deletedAt = const Value.absent(),
+    PgDateTime? createdAt,
+    PgDateTime? updatedAt,
+    Value<PgDateTime?> deletedAt = const Value.absent(),
   }) => TodosTableData(
     id: id ?? this.id,
     userId: userId ?? this.userId,
@@ -933,14 +1019,15 @@ class TodosTableData extends DataClass implements Insertable<TodosTableData> {
 }
 
 class TodosTableCompanion extends UpdateCompanion<TodosTableData> {
-  final Value<int> id;
-  final Value<int> userId;
+  final Value<UuidValue> id;
+  final Value<UuidValue> userId;
   final Value<String> title;
   final Value<String?> description;
   final Value<bool> completed;
-  final Value<DateTime> createdAt;
-  final Value<DateTime> updatedAt;
-  final Value<DateTime?> deletedAt;
+  final Value<PgDateTime> createdAt;
+  final Value<PgDateTime> updatedAt;
+  final Value<PgDateTime?> deletedAt;
+  final Value<int> rowid;
   const TodosTableCompanion({
     this.id = const Value.absent(),
     this.userId = const Value.absent(),
@@ -950,27 +1037,30 @@ class TodosTableCompanion extends UpdateCompanion<TodosTableData> {
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   TodosTableCompanion.insert({
     this.id = const Value.absent(),
-    required int userId,
+    required UuidValue userId,
     required String title,
     this.description = const Value.absent(),
     this.completed = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
   }) : userId = Value(userId),
        title = Value(title);
   static Insertable<TodosTableData> custom({
-    Expression<int>? id,
-    Expression<int>? userId,
+    Expression<UuidValue>? id,
+    Expression<UuidValue>? userId,
     Expression<String>? title,
     Expression<String>? description,
     Expression<bool>? completed,
-    Expression<DateTime>? createdAt,
-    Expression<DateTime>? updatedAt,
-    Expression<DateTime>? deletedAt,
+    Expression<PgDateTime>? createdAt,
+    Expression<PgDateTime>? updatedAt,
+    Expression<PgDateTime>? deletedAt,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -981,18 +1071,20 @@ class TodosTableCompanion extends UpdateCompanion<TodosTableData> {
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   TodosTableCompanion copyWith({
-    Value<int>? id,
-    Value<int>? userId,
+    Value<UuidValue>? id,
+    Value<UuidValue>? userId,
     Value<String>? title,
     Value<String?>? description,
     Value<bool>? completed,
-    Value<DateTime>? createdAt,
-    Value<DateTime>? updatedAt,
-    Value<DateTime?>? deletedAt,
+    Value<PgDateTime>? createdAt,
+    Value<PgDateTime>? updatedAt,
+    Value<PgDateTime?>? deletedAt,
+    Value<int>? rowid,
   }) {
     return TodosTableCompanion(
       id: id ?? this.id,
@@ -1003,6 +1095,7 @@ class TodosTableCompanion extends UpdateCompanion<TodosTableData> {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -1010,10 +1103,10 @@ class TodosTableCompanion extends UpdateCompanion<TodosTableData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<UuidValue>(id.value, PgTypes.uuid);
     }
     if (userId.present) {
-      map['user_id'] = Variable<int>(userId.value);
+      map['user_id'] = Variable<UuidValue>(userId.value, PgTypes.uuid);
     }
     if (title.present) {
       map['title'] = Variable<String>(title.value);
@@ -1025,13 +1118,25 @@ class TodosTableCompanion extends UpdateCompanion<TodosTableData> {
       map['completed'] = Variable<bool>(completed.value);
     }
     if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
+      map['created_at'] = Variable<PgDateTime>(
+        createdAt.value,
+        PgTypes.timestampNoTimezone,
+      );
     }
     if (updatedAt.present) {
-      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+      map['updated_at'] = Variable<PgDateTime>(
+        updatedAt.value,
+        PgTypes.timestampNoTimezone,
+      );
     }
     if (deletedAt.present) {
-      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+      map['deleted_at'] = Variable<PgDateTime>(
+        deletedAt.value,
+        PgTypes.timestampNoTimezone,
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -1046,7 +1151,8 @@ class TodosTableCompanion extends UpdateCompanion<TodosTableData> {
           ..write('completed: $completed, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
-          ..write('deletedAt: $deletedAt')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -1068,27 +1174,31 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 
 typedef $$UsersTableTableCreateCompanionBuilder =
     UsersTableCompanion Function({
-      Value<int> id,
-      required String firstName,
-      required String lastName,
+      Value<UuidValue> id,
+      required String name,
+      Value<String?> firstName,
+      Value<String?> lastName,
       required String email,
       required String password,
       required List<String> roles,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-      Value<DateTime?> deletedAt,
+      Value<PgDateTime> createdAt,
+      Value<PgDateTime> updatedAt,
+      Value<PgDateTime?> deletedAt,
+      Value<int> rowid,
     });
 typedef $$UsersTableTableUpdateCompanionBuilder =
     UsersTableCompanion Function({
-      Value<int> id,
-      Value<String> firstName,
-      Value<String> lastName,
+      Value<UuidValue> id,
+      Value<String> name,
+      Value<String?> firstName,
+      Value<String?> lastName,
       Value<String> email,
       Value<String> password,
       Value<List<String>> roles,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-      Value<DateTime?> deletedAt,
+      Value<PgDateTime> createdAt,
+      Value<PgDateTime> updatedAt,
+      Value<PgDateTime?> deletedAt,
+      Value<int> rowid,
     });
 
 final class $$UsersTableTableReferences
@@ -1105,7 +1215,7 @@ final class $$UsersTableTableReferences
     final manager = $$TodosTableTableTableManager(
       $_db,
       $_db.todosTable,
-    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<int>('id')!));
+    ).filter((f) => f.userId.id.sqlEquals($_itemColumn<UuidValue>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_todosTableRefsTable($_db));
     return ProcessedTableManager(
@@ -1123,8 +1233,13 @@ class $$UsersTableTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
+  ColumnFilters<UuidValue> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1154,17 +1269,17 @@ class $$UsersTableTableFilterComposer
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+  ColumnFilters<PgDateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+  ColumnFilters<PgDateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+  ColumnFilters<PgDateTime> get deletedAt => $composableBuilder(
     column: $table.deletedAt,
     builder: (column) => ColumnFilters(column),
   );
@@ -1204,8 +1319,13 @@ class $$UsersTableTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
+  ColumnOrderings<UuidValue> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -1234,17 +1354,17 @@ class $$UsersTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+  ColumnOrderings<PgDateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+  ColumnOrderings<PgDateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+  ColumnOrderings<PgDateTime> get deletedAt => $composableBuilder(
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
   );
@@ -1259,8 +1379,11 @@ class $$UsersTableTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
+  GeneratedColumn<UuidValue> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
 
   GeneratedColumn<String> get firstName =>
       $composableBuilder(column: $table.firstName, builder: (column) => column);
@@ -1277,13 +1400,13 @@ class $$UsersTableTableAnnotationComposer
   GeneratedColumnWithTypeConverter<List<String>, String> get roles =>
       $composableBuilder(column: $table.roles, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get createdAt =>
+  GeneratedColumn<PgDateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get updatedAt =>
+  GeneratedColumn<PgDateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get deletedAt =>
+  GeneratedColumn<PgDateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
 
   Expression<T> todosTableRefs<T extends Object>(
@@ -1340,17 +1463,20 @@ class $$UsersTableTableTableManager
               $$UsersTableTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
-                Value<String> firstName = const Value.absent(),
-                Value<String> lastName = const Value.absent(),
+                Value<UuidValue> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String?> firstName = const Value.absent(),
+                Value<String?> lastName = const Value.absent(),
                 Value<String> email = const Value.absent(),
                 Value<String> password = const Value.absent(),
                 Value<List<String>> roles = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<PgDateTime> createdAt = const Value.absent(),
+                Value<PgDateTime> updatedAt = const Value.absent(),
+                Value<PgDateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => UsersTableCompanion(
                 id: id,
+                name: name,
                 firstName: firstName,
                 lastName: lastName,
                 email: email,
@@ -1359,20 +1485,24 @@ class $$UsersTableTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
+                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
-                required String firstName,
-                required String lastName,
+                Value<UuidValue> id = const Value.absent(),
+                required String name,
+                Value<String?> firstName = const Value.absent(),
+                Value<String?> lastName = const Value.absent(),
                 required String email,
                 required String password,
                 required List<String> roles,
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<PgDateTime> createdAt = const Value.absent(),
+                Value<PgDateTime> updatedAt = const Value.absent(),
+                Value<PgDateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => UsersTableCompanion.insert(
                 id: id,
+                name: name,
                 firstName: firstName,
                 lastName: lastName,
                 email: email,
@@ -1381,6 +1511,7 @@ class $$UsersTableTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
+                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -1440,25 +1571,27 @@ typedef $$UsersTableTableProcessedTableManager =
     >;
 typedef $$TodosTableTableCreateCompanionBuilder =
     TodosTableCompanion Function({
-      Value<int> id,
-      required int userId,
+      Value<UuidValue> id,
+      required UuidValue userId,
       required String title,
       Value<String?> description,
       Value<bool> completed,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-      Value<DateTime?> deletedAt,
+      Value<PgDateTime> createdAt,
+      Value<PgDateTime> updatedAt,
+      Value<PgDateTime?> deletedAt,
+      Value<int> rowid,
     });
 typedef $$TodosTableTableUpdateCompanionBuilder =
     TodosTableCompanion Function({
-      Value<int> id,
-      Value<int> userId,
+      Value<UuidValue> id,
+      Value<UuidValue> userId,
       Value<String> title,
       Value<String?> description,
       Value<bool> completed,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-      Value<DateTime?> deletedAt,
+      Value<PgDateTime> createdAt,
+      Value<PgDateTime> updatedAt,
+      Value<PgDateTime?> deletedAt,
+      Value<int> rowid,
     });
 
 final class $$TodosTableTableReferences
@@ -1471,7 +1604,7 @@ final class $$TodosTableTableReferences
       );
 
   $$UsersTableTableProcessedTableManager get userId {
-    final $_column = $_itemColumn<int>('user_id')!;
+    final $_column = $_itemColumn<UuidValue>('user_id')!;
 
     final manager = $$UsersTableTableTableManager(
       $_db,
@@ -1494,7 +1627,7 @@ class $$TodosTableTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
+  ColumnFilters<UuidValue> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
@@ -1514,17 +1647,17 @@ class $$TodosTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+  ColumnFilters<PgDateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+  ColumnFilters<PgDateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+  ColumnFilters<PgDateTime> get deletedAt => $composableBuilder(
     column: $table.deletedAt,
     builder: (column) => ColumnFilters(column),
   );
@@ -1562,7 +1695,7 @@ class $$TodosTableTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
+  ColumnOrderings<UuidValue> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnOrderings(column),
   );
@@ -1582,17 +1715,17 @@ class $$TodosTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+  ColumnOrderings<PgDateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+  ColumnOrderings<PgDateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+  ColumnOrderings<PgDateTime> get deletedAt => $composableBuilder(
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
   );
@@ -1630,7 +1763,7 @@ class $$TodosTableTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
+  GeneratedColumn<UuidValue> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get title =>
@@ -1644,13 +1777,13 @@ class $$TodosTableTableAnnotationComposer
   GeneratedColumn<bool> get completed =>
       $composableBuilder(column: $table.completed, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get createdAt =>
+  GeneratedColumn<PgDateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get updatedAt =>
+  GeneratedColumn<PgDateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get deletedAt =>
+  GeneratedColumn<PgDateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
 
   $$UsersTableTableAnnotationComposer get userId {
@@ -1705,14 +1838,15 @@ class $$TodosTableTableTableManager
               $$TodosTableTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
-                Value<int> userId = const Value.absent(),
+                Value<UuidValue> id = const Value.absent(),
+                Value<UuidValue> userId = const Value.absent(),
                 Value<String> title = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<bool> completed = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<PgDateTime> createdAt = const Value.absent(),
+                Value<PgDateTime> updatedAt = const Value.absent(),
+                Value<PgDateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => TodosTableCompanion(
                 id: id,
                 userId: userId,
@@ -1722,17 +1856,19 @@ class $$TodosTableTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
+                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
-                required int userId,
+                Value<UuidValue> id = const Value.absent(),
+                required UuidValue userId,
                 required String title,
                 Value<String?> description = const Value.absent(),
                 Value<bool> completed = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<PgDateTime> createdAt = const Value.absent(),
+                Value<PgDateTime> updatedAt = const Value.absent(),
+                Value<PgDateTime?> deletedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => TodosTableCompanion.insert(
                 id: id,
                 userId: userId,
@@ -1742,6 +1878,7 @@ class $$TodosTableTableTableManager
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
+                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map(
