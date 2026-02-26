@@ -60,10 +60,10 @@ public class JwtTokenProvider {
 
         // Cria token com claims (dados)
         return Jwts.builder()
-                .subject(userId.toString())                    // sub: ID do usuário
-                .claim("email", email)                         // email: email do usuário
-                .issuedAt(now)                                 // iat: data de emissão
-                .expiration(expiryDate)                        // exp: data de expiração
+            .setSubject(userId.toString())                 // sub: ID do usuário
+            .claim("email", email)                        // email: email do usuário
+            .setIssuedAt(now)                              // iat: data de emissão
+            .setExpiration(expiryDate)                     // exp: data de expiração
                 .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()), SignatureAlgorithm.HS256)
                 .compact();
     }

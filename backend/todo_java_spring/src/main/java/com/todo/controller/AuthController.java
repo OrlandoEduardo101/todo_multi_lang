@@ -129,6 +129,9 @@ public class AuthController {
         }
     }
 
+
+
+
     /**
      * Classe interna para respostas de erro
      */
@@ -147,4 +150,5 @@ public class AuthController {
             this.error = error;
         }
     }
+
 }
