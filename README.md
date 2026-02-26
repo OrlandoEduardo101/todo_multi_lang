@@ -317,6 +317,25 @@ cd frontend/todo_flutter
 flutter test
 ```
 
+### Benchmark & Endpoint Validation (3 Backends)
+
+Com os três backends rodando, execute:
+
+```bash
+cd todo_multi_lang
+python3 scripts/backend_benchmark.py --repeats 5
+```
+
+Esse comando:
+- testa os endpoints principais de auth e todo em Java, Go e Dart
+- mede latência por endpoint
+- salva dados brutos em JSON
+- gera relatório Markdown com gráficos Mermaid
+
+Saídas:
+- `reports/benchmark/benchmark_latest.json`
+- `reports/benchmark/benchmark_report_latest.md`
+
 ---
 
 ## 📖 Documentation

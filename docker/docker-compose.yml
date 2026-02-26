@@ -18,28 +18,28 @@ services:
       timeout: 5s
       retries: 10
 
-  # api:
-  #   build:
-  #     context: ../backend/todo_dart_vaden
-  #     dockerfile: Dockerfile
-  #   container_name: todo_vaden_api
-  #   restart: always
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #   environment:
-  #     DB_HOST: postgres
-  #     DB_PORT: 5432
-  #     DB_USER: ${POSTGRES_USER:-postgres}
-  #     DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-  #     DB_NAME: ${POSTGRES_DB:-todo_db}
-  #     JWT_SECRET: ${JWT_SECRET:-change-me-in-prod}
-  #     JWT_EXPIRATION_HOURS: ${JWT_EXPIRATION_HOURS:-72}
-  #   ports:
-  #     - "8080:8080"
-  #   volumes:
-  #     - ../backend/todo_dart_vaden/vaden_data:/app/vaden_data
-  #   command: ["./server"]
+  api:
+    build:
+      context: ../backend/todo_dart_vaden
+      dockerfile: Dockerfile
+    container_name: todo_vaden_api
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DB_NAME: ${POSTGRES_DB:-todo_db}
+      JWT_SECRET: shared-dev-jwt-secret-32-characters-minimum-123456
+      JWT_EXPIRATION_HOURS: ${JWT_EXPIRATION_HOURS:-72}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../backend/todo_dart_vaden/vaden_data:/app/vaden_data
+    command: ["./server"]
 
   todo_java:
     build:
@@ -56,26 +56,30 @@ services:
       DB_USER: ${POSTGRES_USER:-postgres}
       DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       DB_NAME: ${POSTGRES_DB:-todo_db}
-      JWT_SECRET: ${JWT_SECRET:-change-me-in-prod}
+      JWT_SECRET: shared-dev-jwt-secret-32-characters-minimum-123456
       JWT_EXPIRATION: ${JWT_EXPIRATION:-259200}
     ports:
       - "8081:8080"
 
-  # todo_go:
-  #   build:
-  #     context: ../backend/todo_go_fiber
-  #     dockerfile: Dockerfile
-  #   container_name: todo_go
-  #   restart: always
-  #   depends_on:
-  #     - postgres
-  #   ports:
-  #     - "3000:3000"
-  #   env_file:
-  #     - ../backend/.env
-  #   volumes:
-  #     - ../backend/.env:/app/.env
-  #   working_dir: /app
+  todo_go:
+    build:
+      context: ../backend/todo_go_fiber
+      dockerfile: Dockerfile
+    container_name: todo_go
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DB_NAME: ${POSTGRES_DB:-todo_db}
+      JWT_SECRET: shared-dev-jwt-secret-32-characters-minimum-123456
+    ports:
+      - "3000:3000"
+    working_dir: /app
 
   # todo_java:
   #   build:

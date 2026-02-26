@@ -6,5 +6,3 @@ targets:
           sql:
             dialects:
               - postgres
-      vaden_class_scanner:vaden_class_scanner:
-        enabled: true
