@@ -42,7 +42,7 @@ func Register(c *fiber.Ctx) error {
 	}
 
 	// Criptografar a senha
-	hash, err := bcrypt.GenerateFromPassword([]byte(input.Password), 14)
+	hash, err := bcrypt.GenerateFromPassword([]byte(input.Password), 10)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Erro ao gerar hash da senha"})
 	}

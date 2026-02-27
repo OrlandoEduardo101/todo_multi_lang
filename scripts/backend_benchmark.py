@@ -175,8 +175,12 @@ def benchmark_repeats(
     url: str,
     path: str,
     repeats: int,
+    warmup: int = 0,
     headers: Optional[Dict[str, str]] = None,
 ) -> None:
+    for _ in range(max(0, warmup)):
+        http_call(method, url, headers=headers)
+
     for i in range(1, repeats + 1):
         result = http_call(method, url, headers=headers)
         record_call(
@@ -228,6 +232,7 @@ def run_java(
     config: BackendConfig,
     records: List[Dict[str, Any]],
     repeats: int,
+    warmup: int,
     seed_email: Optional[str],
     seed_password: Optional[str],
 ) -> None:
@@ -277,6 +282,7 @@ def run_java(
         url=endpoint_url(config.base_url, list_path),
         path=list_path,
         repeats=repeats,
+        warmup=warmup,
         headers=auth_headers,
     )
 
@@ -285,6 +291,7 @@ def run_go(
     config: BackendConfig,
     records: List[Dict[str, Any]],
     repeats: int,
+    warmup: int,
     seed_email: Optional[str],
     seed_password: Optional[str],
 ) -> None:
@@ -333,6 +340,7 @@ def run_go(
         url=endpoint_url(config.base_url, list_path),
         path=list_path,
         repeats=repeats,
+        warmup=warmup,
         headers=auth_headers,
     )
 
@@ -341,6 +349,7 @@ def run_dart(
     config: BackendConfig,
     records: List[Dict[str, Any]],
     repeats: int,
+    warmup: int,
     seed_email: Optional[str],
     seed_password: Optional[str],
 ) -> None:
@@ -395,11 +404,18 @@ def run_dart(
         url=endpoint_url(config.base_url, list_path),
         path=list_path,
         repeats=repeats,
+        warmup=warmup,
         headers=auth_headers,
     )
 
 
 def summarize(records: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def endpoint_suite(endpoint_name: str) -> str:
+        auth_prefixes = ("register", "login", "login_seed_fallback", "me")
+        if endpoint_name.startswith(auth_prefixes):
+            return "AUTH"
+        return "CRUD"
+
     backend_names = sorted({r["backend"] for r in records})
 
     backend_summary: Dict[str, Dict[str, Any]] = {}
@@ -416,6 +432,40 @@ def summarize(records: List[Dict[str, Any]]) -> Dict[str, Any]:
             "avg_ms": round(statistics.mean(latencies), 3) if latencies else 0.0,
             "p95_ms": round(percentile(latencies, 95), 3) if latencies else 0.0,
         }
+
+    suite_summary: Dict[str, Dict[str, Dict[str, Any]]] = {}
+    for backend in backend_names:
+        suite_summary[backend] = {
+            "AUTH": {"total": 0, "passed": 0, "latencies": []},
+            "CRUD": {"total": 0, "passed": 0, "latencies": []},
+        }
+
+    for r in records:
+        backend = r["backend"]
+        suite = endpoint_suite(r["endpoint"])
+        suite_summary[backend][suite]["total"] += 1
+        suite_summary[backend][suite]["passed"] += 1 if r["ok"] else 0
+        suite_summary[backend][suite]["latencies"].append(r["duration_ms"])
+
+    suite_summary_rows: List[Dict[str, Any]] = []
+    for backend in backend_names:
+        for suite in ("AUTH", "CRUD"):
+            item = suite_summary[backend][suite]
+            total = item["total"]
+            passed = item["passed"]
+            latencies = item["latencies"]
+            suite_summary_rows.append(
+                {
+                    "backend": backend,
+                    "suite": suite,
+                    "total": total,
+                    "passed": passed,
+                    "failed": total - passed,
+                    "pass_rate": round((passed / total) * 100.0, 2) if total else 0.0,
+                    "avg_ms": round(statistics.mean(latencies), 3) if latencies else 0.0,
+                    "p95_ms": round(percentile(latencies, 95), 3) if latencies else 0.0,
+                }
+            )
 
     endpoint_summary: Dict[str, Dict[str, Any]] = {}
     for r in records:
@@ -451,9 +501,11 @@ def summarize(records: List[Dict[str, Any]]) -> Dict[str, Any]:
         })
 
     endpoint_rows.sort(key=lambda x: (x["backend"], x["endpoint"], x["path"]))
+    suite_summary_rows.sort(key=lambda x: (x["backend"], x["suite"]))
 
     return {
         "by_backend": backend_summary,
+        "by_suite_backend": suite_summary_rows,
         "by_endpoint": endpoint_rows,
     }
 
@@ -515,6 +567,16 @@ def generate_markdown(
         )
 
     lines.append("")
+    lines.append("## Suite Summary (AUTH vs CRUD)")
+    lines.append("")
+    lines.append("| Backend | Suite | Total | Passed | Failed | Pass Rate (%) | Avg (ms) | P95 (ms) |")
+    lines.append("|---|---|---:|---:|---:|---:|---:|---:|")
+    for row in summary["by_suite_backend"]:
+        lines.append(
+            f"| {row['backend']} | {row['suite']} | {row['total']} | {row['passed']} | {row['failed']} | {row['pass_rate']} | {row['avg_ms']} | {row['p95_ms']} |"
+        )
+
+    lines.append("")
     lines.append("## Charts")
     lines.append("")
     lines.append(mermaid_avg_latency(summary))
@@ -540,6 +602,8 @@ def main() -> None:
     parser.add_argument("--go-url", default="http://localhost:3000", help="Go backend base URL")
     parser.add_argument("--dart-url", default="http://localhost:8080", help="Dart backend base URL")
     parser.add_argument("--repeats", type=int, default=5, help="Benchmark repeats for read endpoints")
+    parser.add_argument("--warmup", type=int, default=0, help="Warmup runs before collecting benchmark timings")
+    parser.add_argument("--strict", action="store_true", help="Exit with non-zero status if any check fails")
     parser.add_argument("--seed-email", default="cross@test.com", help="Fallback email if fresh login fails")
     parser.add_argument("--seed-password", default="123456", help="Fallback password if fresh login fails")
     parser.add_argument("--output-dir", default="reports/benchmark", help="Output directory for benchmark artifacts")
@@ -576,11 +640,11 @@ def main() -> None:
             )
 
     if backend_readiness["java"]:
-        run_java(java, records, args.repeats, args.seed_email, args.seed_password)
+        run_java(java, records, args.repeats, args.warmup, args.seed_email, args.seed_password)
     if backend_readiness["go"]:
-        run_go(go, records, args.repeats, args.seed_email, args.seed_password)
+        run_go(go, records, args.repeats, args.warmup, args.seed_email, args.seed_password)
     if backend_readiness["dart"]:
-        run_dart(dart, records, args.repeats, args.seed_email, args.seed_password)
+        run_dart(dart, records, args.repeats, args.warmup, args.seed_email, args.seed_password)
 
     summary = summarize(records)
     finished_at = now_iso()
@@ -602,6 +666,8 @@ def main() -> None:
             "go_url": args.go_url,
             "dart_url": args.dart_url,
             "repeats": args.repeats,
+            "warmup": args.warmup,
+            "strict": args.strict,
             "seed_email": args.seed_email,
         },
         "summary": summary,
@@ -620,6 +686,10 @@ def main() -> None:
     print(f"Benchmark JSON (latest): {latest_json_path.as_posix()}")
     print(f"Benchmark report: {report_path.as_posix()}")
     print(f"Benchmark report (latest): {latest_report_path.as_posix()}")
+
+    total_failed = sum(data.get("failed", 0) for data in summary.get("by_backend", {}).values())
+    if args.strict and total_failed > 0:
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

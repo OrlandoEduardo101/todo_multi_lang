@@ -1,2 +1,4 @@
 backend/todo_java_spring/target/classes/com/todo/model/Todo.class
 backend/todo_java_spring/target/classes/*
+reports/benchmark/benchmark_2*.json
+reports/benchmark/benchmark_report_2*.md
