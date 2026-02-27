@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -60,8 +61,13 @@ public class JwtTokenProvider {
 
         // Cria token com claims (dados)
         return Jwts.builder()
+            .setHeaderParam("typ", "JWT")
             .setSubject(userId.toString())                 // sub: ID do usuário
+            .setIssuer("vaden")                           // iss: emissor padrão para interoperabilidade
+            .claim("user_id", userId.toString())          // user_id: compatibilidade com Go/Dart
             .claim("email", email)                        // email: email do usuário
+            .claim("roles", List.of("user"))             // roles: compatibilidade com VadenSecurity
+            .claim("aud", List.of())                      // aud: compatibilidade com tokens do Dart
             .setIssuedAt(now)                              // iat: data de emissão
             .setExpiration(expiryDate)                     // exp: data de expiração
                 .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()), SignatureAlgorithm.HS256)
