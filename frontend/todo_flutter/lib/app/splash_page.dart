@@ -51,8 +51,13 @@ class _SplashPageState extends State<SplashPage> with TickerProviderStateMixin {
       end: 1.1,
     ).animate(CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut));
 
-    authStore.watchAuth();
     authStore.watchAuthCommand.addListener(_onAuthChanged);
+
+    // If auth state is already available (global watcher), navigate immediately.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _onAuthChanged();
+    });
   }
 
   void _onAuthChanged() {

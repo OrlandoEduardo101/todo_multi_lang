@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:todo_flutter/src/modules/auth/stores/auth_session_store.dart';
+import 'package:todo_flutter/src/shared/http/interceptors/auth_interceptor.dart';
 import 'http_client.dart';
 import 'http_exception.dart';
 
@@ -14,11 +16,14 @@ class DioHttpClient implements HttpClient {
   /// Base URL prepended to every request path.
   final String baseUrl;
 
+  final AuthSessionStore authSessionStore;
+
   /// Creates a [DioHttpClient].
   ///
   /// A custom [dio] instance can be injected for testing. When omitted a
   /// default [Dio] instance is used.
-  DioHttpClient({Dio? dio, this.baseUrl = 'http://localhost:3000'}) : _dio = dio ?? Dio() {
+  DioHttpClient({Dio? dio, required this.authSessionStore, this.baseUrl = 'http://localhost:3000'})
+    : _dio = dio ?? Dio() {
     start();
   }
 
@@ -30,47 +35,9 @@ class DioHttpClient implements HttpClient {
 
     _dio.options.baseUrl = baseUrl;
 
-    _dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) {
-          // Adiciona headers padrão a cada requisição
-          options.headers.addAll(_defaultHeaders);
-          handler.next(options);
-        },
-        onError: (DioException error, handler) {
-          final isNetworkError =
-              error.type == DioExceptionType.connectionError ||
-              (error.type == DioExceptionType.unknown && error.response == null);
-          if (isNetworkError) {
-            handler.reject(
-              DioException(requestOptions: error.requestOptions, error: NetworkException('No internet connection')),
-            );
-          } else if (error.response != null) {
-            final statusCode = error.response?.statusCode ?? 0;
-            final message = error.response?.data.toString() ?? 'Unknown error';
-            if (statusCode >= 500) {
-              handler.reject(
-                DioException(
-                  requestOptions: error.requestOptions,
-                  error: ServerException(message, statusCode: statusCode),
-                ),
-              );
-            } else if (statusCode >= 400) {
-              handler.reject(
-                DioException(
-                  requestOptions: error.requestOptions,
-                  error: ClientException(message, statusCode: statusCode),
-                ),
-              );
-            } else {
-              handler.next(error);
-            }
-          } else {
-            handler.next(error);
-          }
-        },
-      ),
-    );
+    _dio.options.headers.addAll(_defaultHeaders);
+
+    _dio.interceptors.add(AuthInterceptor(authSessionStore));
   }
 
   /// {@macro HttpClient.delete}
