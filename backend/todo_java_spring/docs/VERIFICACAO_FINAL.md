@@ -137,10 +137,10 @@ public class Todo {
     @Id
     @GeneratedValue
     private UUID id;
-    
+
     @ManyToOne
     private User user;  // ← Relacionamento com usuário
-    
+
     private String title;
     private String description;
     private Boolean completed;
@@ -177,16 +177,16 @@ public class TodoController {
     public ResponseEntity<?> create(
         @AuthenticationPrincipal UserPrincipal user,
         @RequestBody CreateTodoRequest req) { ... }
-    
+
     @GetMapping
     public ResponseEntity<?> list(@AuthenticationPrincipal UserPrincipal user) { ... }
-    
+
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
         @AuthenticationPrincipal UserPrincipal user,
         @PathVariable UUID id,
         @RequestBody UpdateTodoRequest req) { ... }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(
         @AuthenticationPrincipal UserPrincipal user,
@@ -327,7 +327,7 @@ curl -X POST http://localhost:8080/auth/login \
 
 ---
 
-**Verificado em:** 9 de janeiro de 2026  
-**Status:** ✅ **100% PRONTO PARA PRÓXIMA PHASE**  
+**Verificado em:** 9 de janeiro de 2026
+**Status:** ✅ **100% PRONTO PARA PRÓXIMA PHASE**
 **Próximo:** TODO CRUD Implementation
 
