@@ -8,7 +8,12 @@ import (
 
 // SetupAuthRoutes configura as rotas de autenticação
 func SetupAuthRoutes(app *fiber.App) {
-	// Rotas públicas de autenticação
+	// Rotas públicas de autenticação (contrato padronizado)
+	auth := app.Group("/auth")
+	auth.Post("/register", handlers.Register)
+	auth.Post("/login", handlers.Login)
+
+	// Compatibilidade temporária com clientes legados.
 	app.Post("/register", handlers.Register)
 	app.Post("/login", handlers.Login)
 }

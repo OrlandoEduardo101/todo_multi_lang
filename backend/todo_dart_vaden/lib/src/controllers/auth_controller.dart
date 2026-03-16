@@ -19,15 +19,17 @@ class AppAuthController {
   @ApiResponse(
     201,
     description: 'User registered successfully',
-    content: ApiContent(type: 'application/json', schema: UserProfile),
+    content: ApiContent(type: 'application/json', schema: AuthResponse),
   )
   @ApiResponse(400, description: 'Invalid request data')
   @ApiResponse(409, description: 'User already exists')
   @ApiResponse(500, description: 'Internal server error')
   @Post('/register')
-  Future<UserProfile> register(@Body() RegisterRequest data) async {
+  Future<AuthResponse> register(@Body() RegisterRequest data) async {
     // Validate input
-    if (data.firstName.isEmpty || data.lastName.isEmpty || data.email.isEmpty || data.password.isEmpty) {
+    final derivedFirstName = data.firstName.trim();
+    final derivedLastName = data.lastName.trim();
+    if (derivedFirstName.isEmpty || data.email.isEmpty || data.password.isEmpty) {
       throw const ResponseException(400, 'All fields are required');
     }
 
@@ -42,14 +44,30 @@ class AppAuthController {
 
     // Create user
     final createRequest = CreateUserRequest(
-      firstName: data.firstName,
-      lastName: data.lastName,
+      firstName: derivedFirstName,
+      lastName: derivedLastName,
       email: data.email,
       password: data.password,
     );
 
     try {
-      return await userRepository.create(createRequest);
+      final created = await userRepository.create(createRequest);
+      final tokenization = jwtService.generateToken(
+        UserDetails(username: created.id, password: data.password, roles: created.roles),
+        claims: {'user_id': created.id, 'email': created.email},
+      );
+
+      return AuthResponse(
+        token: tokenization.accessToken,
+        expiresIn: 259200,
+        user: UserAuthProfile(
+          id: created.id,
+          email: created.email,
+          firstName: created.firstName,
+          lastName: created.lastName,
+          roles: created.roles,
+        ),
+      );
     } catch (e) {
       throw ResponseException(500, 'Failed to register user: ${e.toString()}');
     }

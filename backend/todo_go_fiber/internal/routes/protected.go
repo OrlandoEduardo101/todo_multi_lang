@@ -22,8 +22,9 @@ func SetupProtectedRoutes(app *fiber.App) {
 	protected.Get("/me", func(c *fiber.Ctx) error {
 		userID := c.Locals("user_id")
 		return c.JSON(fiber.Map{
-			"message": "Área protegida",
-			"user_id": userID,
+			"user": fiber.Map{
+				"id": userID,
+			},
 		})
 	})
 

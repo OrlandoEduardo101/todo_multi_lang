@@ -14,6 +14,7 @@ func SetupTodoRoutes(protected fiber.Router) {
 	// CRUD de todos
 	todos.Post("/", handlers.CreateTodo)
 	todos.Get("/", handlers.GetTodos)
+	todos.Get("/:id", handlers.GetTodoByID)
 	todos.Put("/:id", handlers.UpdateTodo)
 	todos.Delete("/:id", handlers.DeleteTodo)
 }

@@ -11,6 +11,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func authResponse(user models.User, token string, expiresIn int64) fiber.Map {
+	return fiber.Map{
+		"token":     token,
+		"tokenType": "Bearer",
+		"expiresIn": expiresIn,
+		"user": fiber.Map{
+			"id":    user.ID,
+			"name":  user.Name,
+			"email": user.Email,
+		},
+	}
+}
+
 type RegisterInput struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
@@ -58,14 +71,28 @@ func Register(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Erro ao salvar usuário"})
 	}
 
-	return c.Status(201).JSON(fiber.Map{
-		"message": "Usuário registrado com sucesso",
-		"user": fiber.Map{
-			"id":    user.ID,
-			"name":  user.Name,
-			"email": user.Email,
-		},
+	expiresIn := int64(72 * 60 * 60)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"iss":     "vaden",
+		"aud":     []string{},
+		"sub":     user.ID.String(),
+		"user_id": user.ID.String(),
+		"email":   user.Email,
+		"roles":   []string{"user"},
+		"exp":     time.Now().Add(time.Second * time.Duration(expiresIn)).Unix(),
 	})
+
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		return c.Status(500).JSON(fiber.Map{"error": "Chave secreta JWT não configurada"})
+	}
+
+	tokenString, err := token.SignedString([]byte(secret))
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Erro ao gerar token"})
+	}
+
+	return c.Status(201).JSON(authResponse(user, tokenString, expiresIn))
 }
 
 // Login é o handler para autenticar um usuário
@@ -118,13 +145,6 @@ func Login(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Erro ao gerar token"})
 	}
 
-	return c.JSON(fiber.Map{
-		"message": "Login realizado com sucesso",
-		"token":   tokenString,
-		"user": fiber.Map{
-			"id":    user.ID,
-			"name":  user.Name,
-			"email": user.Email,
-		},
-	})
+	expiresIn := int64(72 * 60 * 60)
+	return c.JSON(authResponse(user, tokenString, expiresIn))
 }

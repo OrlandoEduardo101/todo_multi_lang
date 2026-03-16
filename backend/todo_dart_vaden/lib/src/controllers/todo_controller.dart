@@ -31,13 +31,14 @@ class TodoController {
     @Query('limit') int? limit,
     @Query('search') String? search,
     @Query('completed') bool? completed,
+    @Query('sort') String? sort,
     @Query('sortBy') String? sortBy,
     @Query('order') String? order,
   ) async {
     try {
       final pageNum = page ?? 1;
       final limitNum = limit ?? 10;
-      final sortByField = sortBy ?? 'created_at';
+      final sortByField = sort ?? sortBy ?? 'created_at';
       final sortOrder = order ?? 'desc';
 
       final todos = await todoRepository.findByUserId(

@@ -84,6 +84,12 @@ func GetTodos(c *fiber.Ctx) error {
 		}
 	}
 
+	// Conta o total antes de aplicar paginação.
+	var total int64
+	if err := query.Model(&models.Todo{}).Count(&total).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Erro ao contar tarefas"})
+	}
+
 	// Executa consulta com paginação e ordenação
 	var todos []models.Todo
 	err := query.
@@ -96,22 +102,36 @@ func GetTodos(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Erro ao buscar tarefas"})
 	}
 
+	hasMore := int64(page*limit) < total
+
 	return c.JSON(fiber.Map{
-		"page":  page,
-		"limit": limit,
-		"filters": fiber.Map{
-			"search":    search,
-			"completed": completed,
-			"sort":      sortField,
-			"order":     sortOrder,
-		},
-		"results": todos,
+		"data":    todos,
+		"page":    page,
+		"limit":   limit,
+		"total":   total,
+		"hasMore": hasMore,
 	})
+}
+
+// GetTodoByID retorna uma tarefa específica do usuário autenticado.
+func GetTodoByID(c *fiber.Ctx) error {
+	userID := c.Locals("user_id").(string)
+	todoID := c.Params("id")
+
+	var todo models.Todo
+	if err := database.DB.
+		Where("id = ? AND user_id = ?", todoID, userID).
+		First(&todo).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "Tarefa não encontrada"})
+	}
+
+	return c.JSON(todo)
 }
 
 type CreateTodoInput struct {
 	Title       string  `json:"title"`
 	Description *string `json:"description"`
+	Completed   *bool   `json:"completed"`
 }
 
 // CreateTodo cria uma nova tarefa para o usuário autenticado
@@ -146,6 +166,9 @@ func CreateTodo(c *fiber.Ctx) error {
 		UserID:      parsedUserID,
 		Title:       input.Title,
 		Description: input.Description,
+	}
+	if input.Completed != nil {
+		todo.Completed = *input.Completed
 	}
 
 	if err := database.DB.Create(&todo).Error; err != nil {

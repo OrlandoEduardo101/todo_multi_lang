@@ -3,20 +3,53 @@ import 'package:vaden/vaden.dart';
 /// Request DTO for user registration
 @DTO()
 class RegisterRequest {
-  RegisterRequest({required this.firstName, required this.lastName, required this.email, required this.password});
+  RegisterRequest({
+    required this.firstName,
+    required this.lastName,
+    required this.email,
+    required this.password,
+    this.name,
+  });
 
-  factory RegisterRequest.fromJson(Map<String, dynamic> json) => RegisterRequest(
-    firstName: json['firstName'] as String,
-    lastName: json['lastName'] as String,
-    email: json['email'] as String,
-    password: json['password'] as String,
-  );
+  factory RegisterRequest.fromJson(Map<String, dynamic> json) {
+    final rawName = (json['name'] as String?)?.trim();
+    final firstName = (json['firstName'] as String?)?.trim();
+    final lastName = (json['lastName'] as String?)?.trim();
+
+    if (rawName != null && rawName.isNotEmpty && (firstName == null || firstName.isEmpty)) {
+      final parts = rawName.split(RegExp(r'\s+'));
+      final first = parts.first;
+      final last = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+      return RegisterRequest(
+        firstName: first,
+        lastName: last,
+        email: json['email'] as String,
+        password: json['password'] as String,
+        name: rawName,
+      );
+    }
+
+    return RegisterRequest(
+      firstName: firstName ?? '',
+      lastName: lastName ?? '',
+      email: json['email'] as String,
+      password: json['password'] as String,
+      name: rawName,
+    );
+  }
   final String firstName;
   final String lastName;
   final String email;
   final String password;
+  final String? name;
 
-  Map<String, dynamic> toJson() => {'firstName': firstName, 'lastName': lastName, 'email': email, 'password': password};
+  Map<String, dynamic> toJson() => {
+    'firstName': firstName,
+    'lastName': lastName,
+    if (name != null) 'name': name,
+    'email': email,
+    'password': password,
+  };
 }
 
 /// Request DTO for user login
