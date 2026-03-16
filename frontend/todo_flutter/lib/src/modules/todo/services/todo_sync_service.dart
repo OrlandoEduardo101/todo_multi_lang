@@ -75,7 +75,9 @@ class TodoSyncService {
       return;
     }
 
-    await database.markSynced(localId: entry.id, remoteId: entry.remoteId);
+    // If the server response cannot be parsed, keep it unsynced so it can be
+    // retried instead of becoming a local-only "synced" record.
+    await database.markSyncError(entry.id);
   }
 
   Future<void> _syncUpdate(Todo entry) async {
@@ -118,8 +120,15 @@ class TodoSyncService {
 
   TodoModel? _extractTodo(Map<String, dynamic> response) {
     final dynamic payload = response['data'] ?? response['todo'] ?? response;
-    if (payload is Map<String, dynamic> && payload['id'] != null) {
+    if (payload is Map<String, dynamic> && (payload['id'] != null || payload['ID'] != null)) {
       return TodoModel.fromJson(payload);
+    }
+
+    if (payload is Map<String, dynamic> && payload['results'] is List) {
+      final list = (payload['results'] as List).whereType<Map<String, dynamic>>().toList(growable: false);
+      if (list.isNotEmpty) {
+        return TodoModel.fromJson(list.first);
+      }
     }
     return null;
   }

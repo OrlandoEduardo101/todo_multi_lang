@@ -299,12 +299,12 @@ def run_go(
     email = f"bench_go_{suffix}@test.com"
     password = "123456"
 
-    register_path = "/register"
+    register_path = "/auth/register"
     register_payload = {"name": "Bench Go", "email": email, "password": password}
     register_res = http_call("POST", endpoint_url(config.base_url, register_path), payload=register_payload)
     record_call(records, config.name, "register", "POST", register_path, register_res, expected_statuses=(201, 400))
 
-    login_path = "/login"
+    login_path = "/auth/login"
     token = try_login(config, records, login_path, email, password, seed_email, seed_password)
     auth_headers = {"Authorization": f"Bearer {token}"} if token else {}
 
@@ -312,23 +312,23 @@ def run_go(
     me_res = http_call("GET", endpoint_url(config.base_url, me_path), headers=auth_headers)
     record_call(records, config.name, "me", "GET", me_path, me_res, expected_statuses=(200,))
 
-    list_path = "/api/"
+    list_path = "/api/todos"
     list_res = http_call("GET", endpoint_url(config.base_url, list_path), headers=auth_headers)
     record_call(records, config.name, "list_todos", "GET", list_path, list_res, expected_statuses=(200,))
 
-    create_path = "/api/"
+    create_path = "/api/todos"
     create_payload = {"title": "Bench Go Todo", "description": "created by benchmark", "completed": False}
     create_res = http_call("POST", endpoint_url(config.base_url, create_path), payload=create_payload, headers=auth_headers)
     record_call(records, config.name, "create_todo", "POST", create_path, create_res, expected_statuses=(200, 201))
 
     todo_id = extract_todo_id(create_res.get("json"))
     if todo_id:
-        update_path = f"/api/{todo_id}"
+        update_path = f"/api/todos/{todo_id}"
         update_payload = {"title": "Bench Go Todo Updated", "description": "updated", "completed": True}
         update_res = http_call("PUT", endpoint_url(config.base_url, update_path), payload=update_payload, headers=auth_headers)
         record_call(records, config.name, "update_todo", "PUT", update_path, update_res, expected_statuses=(200,))
 
-        delete_path = f"/api/{todo_id}"
+        delete_path = f"/api/todos/{todo_id}"
         delete_res = http_call("DELETE", endpoint_url(config.base_url, delete_path), headers=auth_headers)
         record_call(records, config.name, "delete_todo", "DELETE", delete_path, delete_res, expected_statuses=(200,))
 

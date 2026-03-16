@@ -73,7 +73,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<AppException, AuthResponseModel>> login(String email, String password) async {
     try {
-      final response = await httpClient.post('/login', body: {'email': email, 'password': password});
+      final response = await httpClient.post('/auth/login', body: {'email': email, 'password': password});
 
       final auth = AuthResponseModel.fromJson(response);
       await database.saveSession(auth);
@@ -128,7 +128,10 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<AppException, AuthResponseModel>> register(String name, String email, String password) async {
     try {
-      final response = await httpClient.post('/register', body: {'name': name, 'email': email, 'password': password});
+      final response = await httpClient.post(
+        '/auth/register',
+        body: {'name': name, 'email': email, 'password': password},
+      );
 
       final auth = AuthResponseModel.fromJson(response);
       await database.saveSession(auth);

@@ -193,6 +193,40 @@ class AppDatabase extends _$AppDatabase {
       return;
     }
 
+    // Legacy recovery: map remote entries to local rows that were marked as
+    // synced without a remoteId.
+    final missingRemote =
+        await (select(todos)
+              ..where(
+                (t) =>
+                    t.remoteId.isNull() &
+                    t.syncStatus.equals(TodoSyncStatus.synced) &
+                    t.title.equals(model.title) &
+                    t.userId.equals(model.userId) &
+                    t.deletedAt.isNull(),
+              )
+              ..orderBy([(t) => OrderingTerm.desc(t.updatedAt)])
+              ..limit(1))
+            .getSingleOrNull();
+
+    if (missingRemote != null) {
+      await (update(todos)..where((t) => t.id.equals(missingRemote.id))).write(
+        TodosCompanion(
+          remoteId: Value(model.remoteId),
+          userId: Value(model.userId),
+          title: Value(model.title),
+          description: Value(model.description),
+          done: Value(model.completed),
+          createdAt: Value(model.createdAt),
+          updatedAt: Value(model.updatedAt),
+          syncStatus: const Value(TodoSyncStatus.synced),
+          lastSyncedAt: Value(DateTime.now()),
+          deletedAt: const Value(null),
+        ),
+      );
+      return;
+    }
+
     await into(todos).insert(
       TodosCompanion.insert(
         remoteId: Value(model.remoteId),

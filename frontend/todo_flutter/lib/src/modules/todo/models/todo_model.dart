@@ -114,13 +114,21 @@ sealed class TodoModel {
   bool get isLocalOnly => remoteId == null;
 
   factory TodoModel.fromJson(Map<String, dynamic> json) {
-    final completed = json['completed'] as bool;
-    final remoteId = json['id'] as String;
-    final userId = json['userId'] as String;
-    final title = json['title'] as String;
-    final description = json['description'] as String?;
-    final createdAt = DateTime.parse(json['createdAt'] as String);
-    final updatedAt = DateTime.parse(json['updatedAt'] as String);
+    T? read<T>(String camel, String pascal) {
+      final dynamic value = json[camel] ?? json[pascal];
+      if (value == null) return null;
+      return value as T;
+    }
+
+    final completed = read<bool>('completed', 'Completed') ?? false;
+    final remoteId = read<String>('id', 'ID') ?? '';
+    final userId = read<String>('userId', 'UserID') ?? '';
+    final title = read<String>('title', 'Title') ?? '';
+    final description = read<String>('description', 'Description');
+    final createdAtRaw = read<String>('createdAt', 'CreatedAt') ?? DateTime.now().toIso8601String();
+    final updatedAtRaw = read<String>('updatedAt', 'UpdatedAt') ?? createdAtRaw;
+    final createdAt = DateTime.tryParse(createdAtRaw) ?? DateTime.now();
+    final updatedAt = DateTime.tryParse(updatedAtRaw) ?? createdAt;
 
     return completed
         ? TodoModel.completed(

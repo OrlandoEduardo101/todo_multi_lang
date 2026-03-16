@@ -2,6 +2,7 @@ import 'package:todo_flutter/src/modules/todo/models/todo_model.dart';
 import 'package:todo_flutter/src/modules/todo/mappers/todo_mapper.dart';
 import 'package:todo_flutter/src/modules/todo/services/todo_sync_service.dart';
 import 'package:todo_flutter/src/shared/database/app_database.dart';
+import 'package:todo_flutter/src/shared/database/tables/todos_table.dart';
 import 'package:todo_flutter/src/shared/either/either.dart';
 import 'package:todo_flutter/src/shared/errors/app_exception.dart';
 import 'package:todo_flutter/src/shared/http/http_client.dart';
@@ -26,6 +27,7 @@ class TodoRepositoryImpl implements TodoRepository {
 
   TodoRepositoryImpl({required this.database, required this.httpClient}) {
     _syncService = TodoSyncService(database: database, httpClient: httpClient);
+    _syncService.startAutoSync();
   }
 
   @override
@@ -100,12 +102,21 @@ class TodoRepositoryImpl implements TodoRepository {
   @override
   Future<Either<AppException, void>> deleteTodo(int id) async {
     try {
-      final existing = await database.getTodoById(id);
+      var existing = await database.getTodoById(id);
       if (existing == null) {
         return Left(AppException('Todo with id $id not found'));
       }
 
       if (existing.remoteId == null) {
+        // Legacy edge-case: item marked as synced but missing remoteId.
+        // Pull remote list and try to reconcile before deciding local-only delete.
+        if (existing.syncStatus == TodoSyncStatus.synced) {
+          await fetchTodos();
+          existing = await database.getTodoById(id);
+        }
+      }
+
+      if (existing?.remoteId == null) {
         await database.deleteTodo(id);
       } else {
         await database.markPendingDelete(id);
@@ -121,6 +132,7 @@ class TodoRepositoryImpl implements TodoRepository {
   Future<Either<AppException, void>> syncTodos() async {
     try {
       await _syncService.syncNow();
+      await fetchTodos();
       return const Right(null);
     } catch (e) {
       return Left(AppException('Failed to sync todos: $e'));
@@ -151,14 +163,42 @@ class TodoRepositoryImpl implements TodoRepository {
   }
 
   List<TodoModel> _extractTodoList(Map<String, dynamic> response) {
-    final dynamic payload = response['data'] ?? response['todos'] ?? response;
+    final dynamic payload = response['data'] ?? response['results'] ?? response['todos'] ?? response;
 
     if (payload is List) {
-      return payload.whereType<Map<String, dynamic>>().map(TodoModel.fromJson).toList(growable: false);
+      return payload
+          .whereType<Map<String, dynamic>>()
+          .map((item) {
+            try {
+              return TodoModel.fromJson(item);
+            } catch (_) {
+              return null;
+            }
+          })
+          .whereType<TodoModel>()
+          .toList(growable: false);
     }
 
-    if (payload is Map<String, dynamic> && payload['id'] != null) {
-      return [TodoModel.fromJson(payload)];
+    if (payload is Map<String, dynamic> && payload['results'] is List) {
+      return (payload['results'] as List)
+          .whereType<Map<String, dynamic>>()
+          .map((item) {
+            try {
+              return TodoModel.fromJson(item);
+            } catch (_) {
+              return null;
+            }
+          })
+          .whereType<TodoModel>()
+          .toList(growable: false);
+    }
+
+    if (payload is Map<String, dynamic> && (payload['id'] != null || payload['ID'] != null)) {
+      try {
+        return [TodoModel.fromJson(payload)];
+      } catch (_) {
+        return const [];
+      }
     }
 
     return const [];
