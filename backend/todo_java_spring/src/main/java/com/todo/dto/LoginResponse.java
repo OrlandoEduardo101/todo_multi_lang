@@ -1,7 +1,5 @@
 package com.todo.dto;
 
-import java.util.UUID;
-
 /**
  * LoginResponse DTO
  *
@@ -20,49 +18,22 @@ import java.util.UUID;
  * }
  */
 public class LoginResponse {
-
-    private UUID id;
-    private String email;
-    private String name;
     private String token;
+    private String tokenType;
     private long expiresIn; // em segundos
+    private UserResponse user;
 
     // Construtores
     public LoginResponse() {}
 
-    public LoginResponse(UUID id, String email, String name, String token, long expiresIn) {
-        this.id = id;
-        this.email = email;
-        this.name = name;
+    public LoginResponse(String token, String tokenType, long expiresIn, UserResponse user) {
         this.token = token;
+        this.tokenType = tokenType;
         this.expiresIn = expiresIn;
+        this.user = user;
     }
 
     // Getters e Setters
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getToken() {
         return token;
     }
@@ -71,11 +42,27 @@ public class LoginResponse {
         this.token = token;
     }
 
+    public String getTokenType() {
+        return tokenType;
+    }
+
+    public void setTokenType(String tokenType) {
+        this.tokenType = tokenType;
+    }
+
     public long getExpiresIn() {
         return expiresIn;
     }
 
     public void setExpiresIn(long expiresIn) {
         this.expiresIn = expiresIn;
+    }
+
+    public UserResponse getUser() {
+        return user;
+    }
+
+    public void setUser(UserResponse user) {
+        this.user = user;
     }
 }

@@ -57,7 +57,7 @@ public class UserService {
      * @return - Resposta com dados do usuário criado (sem a senha!)
      * @throws - Lança exceção se email já existe
      */
-    public UserResponse register(RegisterRequest request) {
+    public LoginResponse register(RegisterRequest request) {
         // 1️⃣ Validar se email já existe
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email já registrado");
@@ -86,12 +86,16 @@ public class UserService {
         // 5️⃣ Salvar no banco de dados
         User savedUser = userRepository.save(user);
 
-        // 6️⃣ Retornar resposta SEM A SENHA! 🔒
-        return new UserResponse(
+        String token = jwtTokenProvider.generateToken(savedUser.getId(), savedUser.getEmail());
+        long expiresIn = jwtTokenProvider.getExpirationSeconds();
+
+        UserResponse userResponse = new UserResponse(
             savedUser.getId().toString(),
             savedUser.getEmail(),
             savedUser.getName()
         );
+
+        return new LoginResponse(token, "Bearer", expiresIn, userResponse);
     }
 
     /**
@@ -151,13 +155,13 @@ public class UserService {
         long expiresIn = jwtTokenProvider.getExpirationSeconds();
 
         // 5️⃣ RETORNAR response
-        return new LoginResponse(
-            user.getId(),
-            user.getEmail(),
-            user.getName(),
-            token,
-            expiresIn
+        UserResponse userResponse = new UserResponse(
+                user.getId().toString(),
+                user.getEmail(),
+                user.getName()
         );
+
+        return new LoginResponse(token, "Bearer", expiresIn, userResponse);
     }
 }
 

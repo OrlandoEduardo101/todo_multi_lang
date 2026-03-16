@@ -76,14 +76,13 @@ public class TodoService {
                 .map(this::toResponse)
                 .toList();
 
+        boolean hasMore = (long) safePage * safeLimit < total;
+
         return new TodoListResponse(
                 safePage,
                 safeLimit,
                 total,
-                search,
-                completed,
-                safeSort,
-                direction.name().toLowerCase(),
+            hasMore,
                 results
         );
     }
@@ -123,6 +122,7 @@ public class TodoService {
     private TodoResponse toResponse(Todo todo) {
         return new TodoResponse(
                 todo.getId(),
+            todo.getUser().getId(),
                 todo.getTitle(),
                 todo.getDescription(),
                 todo.getCompleted(),
@@ -133,6 +133,7 @@ public class TodoService {
 
     private String normalizeSort(String sort) {
         if (sort == null || sort.isBlank()) return "createdAt";
+        if ("created_at".equals(sort)) return "createdAt";
         return switch (sort) {
             case "createdAt", "title", "completed" -> sort;
             default -> "createdAt";

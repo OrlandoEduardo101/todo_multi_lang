@@ -3,7 +3,6 @@ package com.todo.controller;
 import com.todo.dto.LoginRequest;
 import com.todo.dto.LoginResponse;
 import com.todo.dto.RegisterRequest;
-import com.todo.dto.UserResponse;
 import com.todo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -54,12 +53,12 @@ public class AuthController {
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
             // Chamamos o serviço para registrar
-            UserResponse user = userService.register(request);
+            LoginResponse response = userService.register(request);
 
             // ✅ Sucesso! Retorna 201 CREATED com dados do usuário
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(user);
+                    .body(response);
 
         } catch (IllegalArgumentException e) {
             // ❌ Erro de validação (email duplicado, campos vazios, etc)

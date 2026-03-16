@@ -6,11 +6,8 @@ public class TodoListResponse {
     private int page;
     private int limit;
     private long total;
-    private String search;
-    private Boolean completed;
-    private String sort;
-    private String order;
-    private List<TodoResponse> results;
+    private boolean hasMore;
+    private List<TodoResponse> data;
 
     public TodoListResponse() {}
 
@@ -18,20 +15,14 @@ public class TodoListResponse {
             int page,
             int limit,
             long total,
-            String search,
-            Boolean completed,
-            String sort,
-            String order,
-            List<TodoResponse> results
+            boolean hasMore,
+            List<TodoResponse> data
     ) {
         this.page = page;
         this.limit = limit;
         this.total = total;
-        this.search = search;
-        this.completed = completed;
-        this.sort = sort;
-        this.order = order;
-        this.results = results;
+        this.hasMore = hasMore;
+        this.data = data;
     }
 
     public int getPage() { return page; }
@@ -43,18 +34,9 @@ public class TodoListResponse {
     public long getTotal() { return total; }
     public void setTotal(long total) { this.total = total; }
 
-    public String getSearch() { return search; }
-    public void setSearch(String search) { this.search = search; }
+    public boolean isHasMore() { return hasMore; }
+    public void setHasMore(boolean hasMore) { this.hasMore = hasMore; }
 
-    public Boolean getCompleted() { return completed; }
-    public void setCompleted(Boolean completed) { this.completed = completed; }
-
-    public String getSort() { return sort; }
-    public void setSort(String sort) { this.sort = sort; }
-
-    public String getOrder() { return order; }
-    public void setOrder(String order) { this.order = order; }
-
-    public List<TodoResponse> getResults() { return results; }
-    public void setResults(List<TodoResponse> results) { this.results = results; }
+    public List<TodoResponse> getData() { return data; }
+    public void setData(List<TodoResponse> data) { this.data = data; }
 }
