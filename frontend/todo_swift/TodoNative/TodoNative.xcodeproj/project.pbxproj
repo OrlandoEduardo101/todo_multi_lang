@@ -1,0 +1,765 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5D98AA482F699003009E616E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5D98AA0E2F699003009E616E /* Assets.xcassets */; };
+		5D98AA492F699003009E616E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5D98AA2D2F699003009E616E /* Assets.xcassets */; };
+		5D98AA4A2F699003009E616E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D98AA0F2F699003009E616E /* ContentView.swift */; };
+		5D98AA4B2F699003009E616E /* TodoNativeApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D98AA452F699003009E616E /* TodoNativeApp.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		5D98A9FD2F698F1E009E616E /* TodoNative.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TodoNative.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5D98AA0E2F699003009E616E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5D98AA0F2F699003009E616E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		5D98AA2D2F699003009E616E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5D98AA442F699003009E616E /* TodoNative.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = TodoNative.xcodeproj; sourceTree = "<group>"; };
+		5D98AA452F699003009E616E /* TodoNativeApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoNativeApp.swift; sourceTree = "<group>"; };
+		5D98AA4C2F699012009E616E /* TodoNative-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TodoNative-Bridging-Header.h"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5D98A9FA2F698F1E009E616E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5D98A9F42F698F1E009E616E = {
+			isa = PBXGroup;
+			children = (
+				5D98AA0E2F699003009E616E /* Assets.xcassets */,
+				5D98AA0F2F699003009E616E /* ContentView.swift */,
+				5D98AA2B2F699003009E616E /* Features */,
+				5D98AA2E2F699003009E616E /* Resources */,
+				5D98AA3F2F699003009E616E /* Shared */,
+				5D98AA432F699003009E616E /* Tests */,
+				5D98AA442F699003009E616E /* TodoNative.xcodeproj */,
+				5D98AA452F699003009E616E /* TodoNativeApp.swift */,
+				5D98A9FE2F698F1E009E616E /* Products */,
+				5D98AA4C2F699012009E616E /* TodoNative-Bridging-Header.h */,
+			);
+			sourceTree = "<group>";
+		};
+		5D98A9FE2F698F1E009E616E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5D98A9FD2F698F1E009E616E /* TodoNative.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5D98AA102F699003009E616E /* DTOs */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = DTOs;
+			sourceTree = "<group>";
+		};
+		5D98AA112F699003009E616E /* Mappers */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Mappers;
+			sourceTree = "<group>";
+		};
+		5D98AA122F699003009E616E /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Repositories;
+			sourceTree = "<group>";
+		};
+		5D98AA132F699003009E616E /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA102F699003009E616E /* DTOs */,
+				5D98AA112F699003009E616E /* Mappers */,
+				5D98AA122F699003009E616E /* Repositories */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		5D98AA142F699003009E616E /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		5D98AA152F699003009E616E /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Repositories;
+			sourceTree = "<group>";
+		};
+		5D98AA162F699003009E616E /* UseCases */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = UseCases;
+			sourceTree = "<group>";
+		};
+		5D98AA172F699003009E616E /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA142F699003009E616E /* Models */,
+				5D98AA152F699003009E616E /* Repositories */,
+				5D98AA162F699003009E616E /* UseCases */,
+			);
+			path = Domain;
+			sourceTree = "<group>";
+		};
+		5D98AA182F699003009E616E /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		5D98AA192F699003009E616E /* Stores */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Stores;
+			sourceTree = "<group>";
+		};
+		5D98AA1A2F699003009E616E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		5D98AA1B2F699003009E616E /* Presentation */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA182F699003009E616E /* Components */,
+				5D98AA192F699003009E616E /* Stores */,
+				5D98AA1A2F699003009E616E /* Views */,
+			);
+			path = Presentation;
+			sourceTree = "<group>";
+		};
+		5D98AA1C2F699003009E616E /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA132F699003009E616E /* Data */,
+				5D98AA172F699003009E616E /* Domain */,
+				5D98AA1B2F699003009E616E /* Presentation */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		5D98AA1D2F699003009E616E /* DTOs */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = DTOs;
+			sourceTree = "<group>";
+		};
+		5D98AA1E2F699003009E616E /* Mappers */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Mappers;
+			sourceTree = "<group>";
+		};
+		5D98AA1F2F699003009E616E /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Repositories;
+			sourceTree = "<group>";
+		};
+		5D98AA202F699003009E616E /* Services */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		5D98AA212F699003009E616E /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA1D2F699003009E616E /* DTOs */,
+				5D98AA1E2F699003009E616E /* Mappers */,
+				5D98AA1F2F699003009E616E /* Repositories */,
+				5D98AA202F699003009E616E /* Services */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		5D98AA222F699003009E616E /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		5D98AA232F699003009E616E /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Repositories;
+			sourceTree = "<group>";
+		};
+		5D98AA242F699003009E616E /* UseCases */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = UseCases;
+			sourceTree = "<group>";
+		};
+		5D98AA252F699003009E616E /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA222F699003009E616E /* Models */,
+				5D98AA232F699003009E616E /* Repositories */,
+				5D98AA242F699003009E616E /* UseCases */,
+			);
+			path = Domain;
+			sourceTree = "<group>";
+		};
+		5D98AA262F699003009E616E /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		5D98AA272F699003009E616E /* Stores */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Stores;
+			sourceTree = "<group>";
+		};
+		5D98AA282F699003009E616E /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		5D98AA292F699003009E616E /* Presentation */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA262F699003009E616E /* Components */,
+				5D98AA272F699003009E616E /* Stores */,
+				5D98AA282F699003009E616E /* Views */,
+			);
+			path = Presentation;
+			sourceTree = "<group>";
+		};
+		5D98AA2A2F699003009E616E /* Todo */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA212F699003009E616E /* Data */,
+				5D98AA252F699003009E616E /* Domain */,
+				5D98AA292F699003009E616E /* Presentation */,
+			);
+			path = Todo;
+			sourceTree = "<group>";
+		};
+		5D98AA2B2F699003009E616E /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA1C2F699003009E616E /* Auth */,
+				5D98AA2A2F699003009E616E /* Todo */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		5D98AA2C2F699003009E616E /* Localization */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Localization;
+			sourceTree = "<group>";
+		};
+		5D98AA2E2F699003009E616E /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA2C2F699003009E616E /* Localization */,
+				5D98AA2D2F699003009E616E /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		5D98AA302F699003009E616E /* Either */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Either;
+			sourceTree = "<group>";
+		};
+		5D98AA312F699003009E616E /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Errors;
+			sourceTree = "<group>";
+		};
+		5D98AA322F699003009E616E /* Reactive */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Reactive;
+			sourceTree = "<group>";
+		};
+		5D98AA332F699003009E616E /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA302F699003009E616E /* Either */,
+				5D98AA312F699003009E616E /* Errors */,
+				5D98AA322F699003009E616E /* Reactive */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		5D98AA342F699003009E616E /* Migrations */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Migrations;
+			sourceTree = "<group>";
+		};
+		5D98AA352F699003009E616E /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		5D98AA362F699003009E616E /* Database */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA342F699003009E616E /* Migrations */,
+				5D98AA352F699003009E616E /* Models */,
+			);
+			path = Database;
+			sourceTree = "<group>";
+		};
+		5D98AA372F699003009E616E /* Client */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Client;
+			sourceTree = "<group>";
+		};
+		5D98AA382F699003009E616E /* Interceptors */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Interceptors;
+			sourceTree = "<group>";
+		};
+		5D98AA392F699003009E616E /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA372F699003009E616E /* Client */,
+				5D98AA382F699003009E616E /* Interceptors */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		5D98AA3A2F699003009E616E /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA362F699003009E616E /* Database */,
+				5D98AA392F699003009E616E /* Network */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		5D98AA3B2F699003009E616E /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		5D98AA3C2F699003009E616E /* Responsive */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Responsive;
+			sourceTree = "<group>";
+		};
+		5D98AA3D2F699003009E616E /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		5D98AA3E2F699003009E616E /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA3B2F699003009E616E /* Components */,
+				5D98AA3C2F699003009E616E /* Responsive */,
+				5D98AA3D2F699003009E616E /* Theme */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		5D98AA3F2F699003009E616E /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA332F699003009E616E /* Core */,
+				5D98AA3A2F699003009E616E /* Data */,
+				5D98AA3E2F699003009E616E /* UI */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		5D98AA402F699003009E616E /* Integration */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Integration;
+			sourceTree = "<group>";
+		};
+		5D98AA412F699003009E616E /* Snapshot */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Snapshot;
+			sourceTree = "<group>";
+		};
+		5D98AA422F699003009E616E /* Unit */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Unit;
+			sourceTree = "<group>";
+		};
+		5D98AA432F699003009E616E /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				5D98AA402F699003009E616E /* Integration */,
+				5D98AA412F699003009E616E /* Snapshot */,
+				5D98AA422F699003009E616E /* Unit */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		5D98AA462F699003009E616E /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5D98A9FC2F698F1E009E616E /* TodoNative */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5D98AA082F698F20009E616E /* Build configuration list for PBXNativeTarget "TodoNative" */;
+			buildPhases = (
+				5D98A9F92F698F1E009E616E /* Sources */,
+				5D98A9FA2F698F1E009E616E /* Frameworks */,
+				5D98A9FB2F698F1E009E616E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TodoNative;
+			packageProductDependencies = (
+			);
+			productName = TodoNative;
+			productReference = 5D98A9FD2F698F1E009E616E /* TodoNative.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5D98A9F52F698F1E009E616E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2630;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					5D98A9FC2F698F1E009E616E = {
+						CreatedOnToolsVersion = 26.3;
+						LastSwiftMigration = 2630;
+					};
+				};
+			};
+			buildConfigurationList = 5D98A9F82F698F1E009E616E /* Build configuration list for PBXProject "TodoNative" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 5D98A9F42F698F1E009E616E;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 5D98A9FE2F698F1E009E616E /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 5D98AA462F699003009E616E /* Products */;
+					ProjectRef = 5D98AA442F699003009E616E /* TodoNative.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				5D98A9FC2F698F1E009E616E /* TodoNative */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5D98A9FB2F698F1E009E616E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5D98AA482F699003009E616E /* Assets.xcassets in Resources */,
+				5D98AA492F699003009E616E /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5D98A9F92F698F1E009E616E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5D98AA4A2F699003009E616E /* ContentView.swift in Sources */,
+				5D98AA4B2F699003009E616E /* TodoNativeApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		5D98AA062F698F20009E616E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = TX84WW6HYP;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		5D98AA072F698F20009E616E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = TX84WW6HYP;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		5D98AA092F698F20009E616E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TX84WW6HYP;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = orlandoeduardo101.TodoNative;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "TodoNative-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5D98AA0A2F698F20009E616E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TX84WW6HYP;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = orlandoeduardo101.TodoNative;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "TodoNative-Bridging-Header.h";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5D98A9F82F698F1E009E616E /* Build configuration list for PBXProject "TodoNative" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5D98AA062F698F20009E616E /* Debug */,
+				5D98AA072F698F20009E616E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5D98AA082F698F20009E616E /* Build configuration list for PBXNativeTarget "TodoNative" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5D98AA092F698F20009E616E /* Debug */,
+				5D98AA0A2F698F20009E616E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 5D98A9F52F698F1E009E616E /* Project object */;
+}
